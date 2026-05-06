@@ -1,0 +1,656 @@
+<!doctype html>
+<html lang="pt-BR" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestão de Redes - Ortobom 04</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    html, body { height: 100%; box-sizing: border-box; background: #0d1117; color: #e6edf3; font-family: 'Outfit', sans-serif; }
+    .mono { font-family: 'JetBrains Mono', monospace; }
+    .ip-row:hover { background: #1a2332; cursor: pointer; }
+    .tab-btn.active { border-bottom: 2px solid #238636; color: white; }
+    .status-livre { color: #4ade80; }
+    .status-terminal { color: #79c0ff; }
+    .status-servidor { color: #f87171; }
+    .status-em-uso { color: #d29922; }
+    .status-reservado { color: #a78bfa; }
+    .status-inativo { color: #9ca3af; }
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: #0d1117; }
+    ::-webkit-scrollbar-thumb { background: #2d3748; border-radius: 4px; }
+  </style>
+</head>
+<body class="overflow-hidden">
+
+  <!-- Tela de Login -->
+  <div id="login-overlay" class="fixed inset-0 bg-[#0d1117] z-[100] flex flex-col items-center justify-center p-4">
+    <div class="bg-[#161b22] border border-[#30363d] rounded-xl p-8 max-w-sm w-full text-center shadow-2xl">
+      <div class="w-16 h-16 mx-auto bg-gradient-to-br from-[#238636] to-[#1a6e2e] rounded-lg flex items-center justify-center mb-6">
+        <i data-lucide="shield-check" class="w-8 h-8 text-white"></i>
+      </div>
+      <h2 class="text-2xl font-bold text-white mb-2">Acesso Restrito TI</h2>
+      <p class="text-gray-400 text-sm mb-6">Insira a credencial padrão para acessar.</p>
+      <input id="password-input" type="password" placeholder="Senha de acesso" class="w-full bg-[#0d1117] border border-[#30363d] rounded-lg px-4 py-3 text-center text-white focus:outline-none focus:border-[#238636] mb-4">
+      <button id="login-btn" class="w-full bg-[#238636] hover:bg-[#2ea043] text-white font-semibold py-3 rounded-lg transition">Entrar no Sistema</button>
+      <p id="login-error" class="text-red-500 text-sm mt-3 hidden">Senha incorreta. Acesso negado.</p>
+    </div>
+  </div>
+
+  <!-- Aplicação Principal -->
+  <div id="app" class="w-full h-full flex flex-col hidden">
+    <header class="bg-[#161b22] border-b border-[#30363d] px-6 py-4 flex items-center justify-between flex-shrink-0">
+      <div class="flex items-center gap-4">
+        <div class="w-10 h-10 rounded-lg bg-[#238636] flex items-center justify-center shadow-lg">
+          <i data-lucide="network" class="w-6 h-6 text-white"></i>
+        </div>
+        <div>
+          <h1 class="text-xl font-bold text-white">Gestão de Redes - Ortobom 04</h1>
+          <p class="text-sm text-gray-400 mono">Sub-rede: 10.0.4.1/254</p>
+        </div>
+      </div>
+      <button id="logout-btn" class="text-gray-400 hover:text-white transition flex items-center gap-2 text-sm">
+        <i data-lucide="log-out" class="w-4 h-4"></i> Sair
+      </button>
+    </header>
+
+    <div class="bg-[#161b22] border-b border-[#30363d] px-6 flex gap-6 flex-shrink-0">
+      <button class="tab-btn active py-3 text-sm font-medium text-gray-400 hover:text-white" data-target="view-ips"><i data-lucide="table" class="inline w-4 h-4 mr-2"></i>Mapa de IPs</button>
+      <button class="tab-btn py-3 text-sm font-medium text-gray-400 hover:text-white" data-target="view-tools"><i data-lucide="settings" class="inline w-4 h-4 mr-2"></i>Ferramentas & Cadastros</button>
+      <button class="tab-btn py-3 text-sm font-medium text-gray-400 hover:text-white" data-target="view-notes"><i data-lucide="book-open" class="inline w-4 h-4 mr-2"></i>Agenda e Notas</button>
+    </div>
+
+    <!-- View: Mapa de IPs -->
+    <div id="view-ips" class="flex-1 overflow-auto flex flex-col view-section">
+      <div class="px-6 py-3 bg-[#161b22] border-b border-[#30363d] flex items-center gap-4 flex-shrink-0">
+        <div class="relative flex-1 max-w-md">
+          <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500"></i>
+          <input id="search-ip" type="text" placeholder="Buscar no mapa de IPs..." class="w-full bg-[#0d1117] border border-[#30363d] rounded-lg pl-10 pr-4 py-2 text-sm focus:outline-none focus:border-[#238636]">
+        </div>
+      </div>
+      <div class="flex-1 overflow-auto">
+        <table class="w-full text-sm">
+          <thead class="sticky top-0 bg-[#0d1117] z-10 border-b border-[#30363d]">
+            <tr class="text-gray-500 text-xs uppercase tracking-wider">
+              <th class="text-left py-3 px-6 w-[120px]">Endereço IP</th>
+              <th class="text-left py-3 px-6 w-[150px]">Status</th>
+              <th class="text-left py-3 px-6 w-[180px]">Usuário / Responsável</th>
+              <th class="text-left py-3 px-6 w-[150px]">Local</th>
+              <th class="text-left py-3 px-6 w-[180px]">Detalhes Técnicos</th>
+              <th class="text-left py-3 px-6 flex-1">Observações</th>
+              <th class="text-left py-3 px-6 w-[120px]">Última Edição</th>
+            </tr>
+          </thead>
+          <tbody id="ip-table-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- View: Ferramentas & Cadastros Globais -->
+    <div id="view-tools" class="hidden flex-1 overflow-auto p-6 view-section bg-[#0d1117]">
+      <div class="max-w-6xl mx-auto grid grid-cols-2 gap-8">
+        
+        <!-- Bloco Servidores -->
+        <div>
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-lg font-semibold text-white">Servidores da Rede</h2>
+            <button onclick="abrirModalServidor()" class="bg-[#238636] hover:bg-[#2ea043] text-white px-3 py-1.5 rounded-lg text-sm font-medium transition flex items-center gap-2">
+              <i data-lucide="plus" class="w-4 h-4"></i> Adicionar
+            </button>
+          </div>
+          <div class="bg-[#161b22] border border-[#30363d] rounded-lg overflow-hidden">
+            <table class="w-full text-sm">
+              <thead class="bg-[#0d1117] border-b border-[#30363d]">
+                <tr class="text-gray-500 text-xs uppercase tracking-wider text-left">
+                  <th class="py-3 px-4">IP</th>
+                  <th class="py-3 px-4">Nome</th>
+                  <th class="py-3 px-4 text-right">Ação</th>
+                </tr>
+              </thead>
+              <tbody id="servers-table-body"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Bloco Modelos de Terminal -->
+        <div>
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-lg font-semibold text-white">Modelos de Terminal</h2>
+            <button onclick="abrirModalModelo()" class="bg-[#238636] hover:bg-[#2ea043] text-white px-3 py-1.5 rounded-lg text-sm font-medium transition flex items-center gap-2">
+              <i data-lucide="plus" class="w-4 h-4"></i> Adicionar
+            </button>
+          </div>
+          <div class="bg-[#161b22] border border-[#30363d] rounded-lg overflow-hidden">
+            <table class="w-full text-sm">
+              <thead class="bg-[#0d1117] border-b border-[#30363d]">
+                <tr class="text-gray-500 text-xs uppercase tracking-wider text-left">
+                  <th class="py-3 px-4">Modelo</th>
+                  <th class="py-3 px-4">Descrição</th>
+                  <th class="py-3 px-4 text-right">Ação</th>
+                </tr>
+              </thead>
+              <tbody id="models-table-body"></tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- View: Bloco de Notas -->
+    <div id="view-notes" class="hidden flex-1 flex flex-col p-6 view-section bg-[#0d1117]">
+      <div class="max-w-5xl mx-auto w-full flex-1 flex flex-col">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-lg font-semibold text-white">Agenda e Anotações da Equipe</h2>
+          <button id="save-notes-btn" class="bg-[#238636] hover:bg-[#2ea043] text-white px-4 py-2 rounded-lg text-sm font-medium transition flex items-center gap-2">
+            <i data-lucide="save" class="w-4 h-4"></i> Salvar Anotações
+          </button>
+        </div>
+        <textarea id="notepad-area" class="flex-1 w-full bg-[#161b22] border border-[#30363d] rounded-lg p-4 text-gray-200 focus:outline-none focus:border-[#238636] resize-none" placeholder="Escreva aqui as rotinas, agendas ou recados da equipe..."></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Configurar IP Principal -->
+  <div id="modal-ip" class="hidden fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4">
+    <div class="bg-[#161b22] border border-[#30363d] rounded-xl w-full max-w-md p-6" onclick="event.stopPropagation()">
+      <div class="flex items-center justify-between mb-6">
+        <h2 class="text-lg font-semibold text-white">Configurar IP</h2>
+        <button class="close-modal text-gray-500 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+      
+      <p id="modal-ip-label" class="mono text-[#238636] font-bold text-xl mb-4"></p>
+      
+      <div class="space-y-4">
+        <!-- Status Geral -->
+        <div>
+          <label class="block text-xs text-gray-400 mb-1">Status</label>
+          <select id="modal-status" class="w-full bg-[#0d1117] border border-[#30363d] rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#238636]">
+            <option value="livre">Livre</option>
+            <option value="em_uso">Em uso</option>
+            <option value="servidor">Servidor</option>
+            <option value="inativo">Inativo</option>
+            <option value="terminal">Terminal</option>
+            <option value="reservado">Reservado</option>
+          </select>
+        </div>
+
+        <!-- Inputs Dinâmicos: Usuário e Local (Aparece para a maioria, exceto Livre) -->
+        <div id="field-usuario" class="hidden">
+          <label class="block text-xs text-gray-400 mb-1">Usuário / Responsável</label>
+          <input id="modal-usuario" type="text" placeholder="Ex: João - Faturamento" class="w-full bg-[#0d1117] border border-[#30363d] rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#238636]">
+        </div>
+        <div id="field-local" class="hidden">
+          <label class="block text-xs text-gray-400 mb-1">Local / Setor</label>
+          <input id="modal-local" type="text" placeholder="Ex: Sala RH" class="w-full bg-[#0d1117] border border-[#30363d] rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#238636]">
+        </div>
+
+        <!-- Secção Específica: Terminal -->
+        <div id="section-terminal" class="hidden p-3 bg-[#0d1117] border border-[#30363d] rounded-lg space-y-3">
+          <p class="text-xs text-gray-500 uppercase font-semibold">Detalhes do Terminal</p>
+          <div>
+            <label class="block text-xs text-gray-400 mb-1">Modelo do Terminal</label>
+            <select id="modal-modelo-terminal" class="w-full bg-[#161b22] border border-[#30363d] rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#238636]">
+              <option value="">Selecione o modelo...</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs text-gray-400 mb-1">Servidor Alocado (Conexão)</label>
+            <select id="modal-servidor-alvo" class="w-full bg-[#161b22] border border-[#30363d] rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#238636]">
+              <option value="">Selecione o servidor...</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Secção Específica: Servidor (Caixa Rápida) -->
+        <div id="section-servidor" class="hidden p-3 bg-[#0d1117] border border-[#30363d] rounded-lg">
+          <p class="text-xs text-gray-500 mb-2">Este IP está marcado como Servidor.</p>
+          <button id="btn-quick-add-server" class="w-full bg-[#30363d] hover:bg-[#21262d] text-white py-2 rounded-lg text-sm transition flex items-center justify-center gap-2 border border-gray-600">
+            <i data-lucide="server" class="w-4 h-4"></i> Cadastrar na Lista Global de Servidores
+          </button>
+        </div>
+
+        <!-- Observações (Sempre aparece exceto Livre) -->
+        <div id="field-observacao" class="hidden">
+          <label class="block text-xs text-gray-400 mb-1">Observações Gerais</label>
+          <textarea id="modal-obs" rows="3" placeholder="Detalhes adicionais..." class="w-full bg-[#0d1117] border border-[#30363d] rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#238636] resize-none"></textarea>
+        </div>
+      </div>
+
+      <div class="flex gap-3 mt-6">
+        <button id="btn-salvar-ip" class="flex-1 bg-[#238636] hover:bg-[#2ea043] text-white font-medium py-2 rounded-lg text-sm transition">Salvar Configuração</button>
+        <button id="btn-limpar-ip" class="px-4 bg-[#21262d] border border-[#30363d] hover:bg-[#da3633] hover:border-[#da3633] text-gray-300 hover:text-white font-medium py-2 rounded-lg text-sm transition">Zerar IP</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Adicionar Servidor (Global) -->
+  <div id="modal-add-server" class="hidden fixed inset-0 bg-black/70 z-[60] flex items-center justify-center p-4">
+    <div class="bg-[#161b22] border border-[#30363d] rounded-xl w-full max-w-sm p-6" onclick="event.stopPropagation()">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-lg font-semibold text-white">Cadastrar Servidor</h2>
+        <button class="close-add-modal text-gray-500 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+      <div class="space-y-4">
+        <div>
+          <label class="block text-xs text-gray-400 mb-1">Endereço IP</label>
+          <input id="add-server-ip" type="text" placeholder="Ex: 10.0.4.200" class="w-full bg-[#0d1117] border border-[#30363d] rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#238636]">
+        </div>
+        <div>
+          <label class="block text-xs text-gray-400 mb-1">Nome do Servidor</label>
+          <input id="add-server-nome" type="text" placeholder="Ex: Servidor AD" class="w-full bg-[#0d1117] border border-[#30363d] rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#238636]">
+        </div>
+        <button id="submit-add-server" class="w-full bg-[#238636] hover:bg-[#2ea043] text-white font-medium py-2 rounded-lg text-sm transition mt-2">Salvar na Lista</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Adicionar Modelo (Global) -->
+  <div id="modal-add-model" class="hidden fixed inset-0 bg-black/70 z-[60] flex items-center justify-center p-4">
+    <div class="bg-[#161b22] border border-[#30363d] rounded-xl w-full max-w-sm p-6" onclick="event.stopPropagation()">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-lg font-semibold text-white">Cadastrar Modelo</h2>
+        <button class="close-add-modal text-gray-500 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+      <div class="space-y-4">
+        <div>
+          <label class="block text-xs text-gray-400 mb-1">Nome do Modelo</label>
+          <input id="add-model-nome" type="text" placeholder="Ex: L300.2" class="w-full bg-[#0d1117] border border-[#30363d] rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#238636]">
+        </div>
+        <div>
+          <label class="block text-xs text-gray-400 mb-1">Descrição</label>
+          <input id="add-model-desc" type="text" placeholder="Ex: Sem suporte ao 2016" class="w-full bg-[#0d1117] border border-[#30363d] rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#238636]">
+        </div>
+        <button id="submit-add-model" class="w-full bg-[#238636] hover:bg-[#2ea043] text-white font-medium py-2 rounded-lg text-sm transition mt-2">Salvar Modelo</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Notificação -->
+  <div id="toast" class="fixed bottom-4 right-4 bg-[#161b22] border border-[#30363d] rounded-lg px-4 py-3 text-sm text-white hidden z-[200] shadow-xl flex items-center gap-2 transition-opacity">
+    <i id="toast-icon" data-lucide="info" class="w-4 h-4"></i> <span id="toast-msg"></span>
+  </div>
+
+  <script>
+    let AUTH_TOKEN = localStorage.getItem('ortobom_auth') || '';
+    let dadosIps = [];
+    let dadosServidores = [];
+    let dadosModelos = [];
+    let currentSuffix = null;
+
+    function init() {
+      lucide.createIcons();
+      if (AUTH_TOKEN === 'orto0421@') {
+        document.getElementById('login-overlay').classList.add('hidden');
+        document.getElementById('app').classList.remove('hidden');
+        carregarTudo();
+      }
+    }
+
+    function showToast(msg, type = 'success') {
+      const toast = document.getElementById('toast');
+      document.getElementById('toast-msg').textContent = msg;
+      const icon = document.getElementById('toast-icon');
+      if (type === 'error') {
+        icon.setAttribute('data-lucide', 'alert-circle');
+        icon.style.color = '#f87171';
+      } else {
+        icon.setAttribute('data-lucide', 'check-circle');
+        icon.style.color = '#4ade80';
+      }
+      lucide.createIcons();
+      toast.classList.remove('hidden');
+      setTimeout(() => toast.classList.add('hidden'), 3000);
+    }
+
+    document.getElementById('login-btn').addEventListener('click', () => {
+      const pass = document.getElementById('password-input').value;
+      if (pass === 'orto0421@') {
+        AUTH_TOKEN = pass;
+        localStorage.setItem('ortobom_auth', pass);
+        document.getElementById('login-error').classList.add('hidden');
+        document.getElementById('login-overlay').classList.add('hidden');
+        document.getElementById('app').classList.remove('hidden');
+        carregarTudo();
+      } else {
+        document.getElementById('login-error').classList.remove('hidden');
+      }
+    });
+
+    document.getElementById('logout-btn').addEventListener('click', () => {
+      AUTH_TOKEN = '';
+      localStorage.removeItem('ortobom_auth');
+      document.getElementById('app').classList.add('hidden');
+      document.getElementById('login-overlay').classList.remove('hidden');
+      document.getElementById('password-input').value = '';
+    });
+
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        document.querySelectorAll('.view-section').forEach(v => v.classList.add('hidden'));
+        document.getElementById(btn.dataset.target).classList.remove('hidden');
+      });
+    });
+
+    async function apiRequest(endpoint, options = {}) {
+      const headers = {
+        'Content-Type': 'application/json',
+        'Authorization': AUTH_TOKEN
+      };
+      const response = await fetch(endpoint, { ...options, headers });
+      if (response.status === 401) {
+        document.getElementById('logout-btn').click();
+        throw new Error('Não autorizado');
+      }
+      return response;
+    }
+
+    async function carregarTudo() {
+      await carregarServidores();
+      await carregarModelos();
+      await carregarIps();
+      await carregarNotas();
+    }
+
+    // --- FERRAMENTAS: SERVIDORES E MODELOS ---
+    async function carregarServidores() {
+      const res = await apiRequest('/api/servers');
+      if (res.ok) {
+        dadosServidores = await res.json();
+        renderizarListaServidores();
+        atualizarDropdownServidores();
+      }
+    }
+
+    function renderizarListaServidores() {
+      const tbody = document.getElementById('servers-table-body');
+      tbody.innerHTML = dadosServidores.map(s => `
+        <tr class="border-b border-[#21262d] hover:bg-[#1a2332]">
+          <td class="py-2 px-4 mono text-[#60a5fa]">${s.ip}</td>
+          <td class="py-2 px-4 text-gray-200">${s.nome}</td>
+          <td class="py-2 px-4 text-right">
+            <button onclick="deletarServidor(${s.id})" class="text-red-500 hover:text-red-400"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+          </td>
+        </tr>
+      `).join('');
+      lucide.createIcons();
+    }
+
+    function atualizarDropdownServidores() {
+      const select = document.getElementById('modal-servidor-alvo');
+      select.innerHTML = '<option value="">Selecione o servidor...</option>' + 
+        dadosServidores.map(s => `<option value="${s.ip}">${s.nome} (${s.ip})</option>`).join('');
+    }
+
+    async function carregarModelos() {
+      const res = await apiRequest('/api/models');
+      if (res.ok) {
+        dadosModelos = await res.json();
+        renderizarListaModelos();
+        atualizarDropdownModelos();
+      }
+    }
+
+    function renderizarListaModelos() {
+      const tbody = document.getElementById('models-table-body');
+      tbody.innerHTML = dadosModelos.map(m => `
+        <tr class="border-b border-[#21262d] hover:bg-[#1a2332]">
+          <td class="py-2 px-4 text-[#4ade80] font-medium">${m.nome}</td>
+          <td class="py-2 px-4 text-gray-400 text-xs">${m.descricao}</td>
+          <td class="py-2 px-4 text-right">
+            <button onclick="deletarModelo(${m.id})" class="text-red-500 hover:text-red-400"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+          </td>
+        </tr>
+      `).join('');
+      lucide.createIcons();
+    }
+
+    function atualizarDropdownModelos() {
+      const select = document.getElementById('modal-modelo-terminal');
+      select.innerHTML = '<option value="">Selecione o modelo...</option>' + 
+        dadosModelos.map(m => `<option value="${m.nome}">${m.nome} ${m.descricao ? ' - '+m.descricao : ''}</option>`).join('');
+    }
+
+    window.abrirModalServidor = function() {
+      document.getElementById('add-server-ip').value = currentSuffix ? `10.0.4.${currentSuffix}` : '';
+      document.getElementById('add-server-nome').value = '';
+      document.getElementById('modal-add-server').classList.remove('hidden');
+    }
+
+    window.abrirModalModelo = function() {
+      document.getElementById('add-model-nome').value = '';
+      document.getElementById('add-model-desc').value = '';
+      document.getElementById('modal-add-model').classList.remove('hidden');
+    }
+
+    document.getElementById('submit-add-server').addEventListener('click', async () => {
+      const ip = document.getElementById('add-server-ip').value;
+      const nome = document.getElementById('add-server-nome').value;
+      if (!ip || !nome) return showToast('Preencha IP e Nome', 'error');
+      
+      const res = await apiRequest('/api/servers', { method: 'POST', body: JSON.stringify({ ip, nome, tipo: 'acessivel' }) });
+      if (res.ok) {
+        showToast('Servidor salvo na lista!');
+        document.getElementById('modal-add-server').classList.add('hidden');
+        carregarServidores();
+      }
+    });
+
+    document.getElementById('submit-add-model').addEventListener('click', async () => {
+      const nome = document.getElementById('add-model-nome').value;
+      const desc = document.getElementById('add-model-desc').value;
+      if (!nome) return showToast('Preencha o Nome do Modelo', 'error');
+      
+      const res = await apiRequest('/api/models', { method: 'POST', body: JSON.stringify({ nome, descricao: desc }) });
+      if (res.ok) {
+        showToast('Modelo salvo!');
+        document.getElementById('modal-add-model').classList.add('hidden');
+        carregarModelos();
+      }
+    });
+
+    window.deletarServidor = async function(id) {
+      if (confirm('Deletar servidor da lista global?')) {
+        const res = await apiRequest(`/api/servers?id=${id}`, { method: 'DELETE' });
+        if (res.ok) { showToast('Deletado.'); carregarServidores(); }
+      }
+    };
+
+    window.deletarModelo = async function(id) {
+      if (confirm('Deletar modelo da lista?')) {
+        const res = await apiRequest(`/api/models?id=${id}`, { method: 'DELETE' });
+        if (res.ok) { showToast('Deletado.'); carregarModelos(); }
+      }
+    };
+
+    // --- MAPA DE IPS ---
+    async function carregarIps() {
+      const res = await apiRequest('/api/ips');
+      if (res.ok) {
+        dadosIps = await res.json();
+        renderizarIps();
+      }
+    }
+
+    function renderizarIps() {
+      const tbody = document.getElementById('ip-table-body');
+      const busca = document.getElementById('search-ip').value.toLowerCase();
+      let html = '';
+
+      const labelMap = {
+        'livre': 'Livre', 'em_uso': 'Em Uso', 'servidor': 'Servidor', 
+        'inativo': 'Inativo', 'terminal': 'Terminal', 'reservado': 'Reservado'
+      };
+
+      for (let i = 1; i <= 254; i++) {
+        const ip = `10.0.4.${i}`;
+        const config = dadosIps.find(d => d.ip_suffix === i);
+        
+        const status = config ? config.status : 'livre';
+        const usuario = config ? config.usuario || '' : '';
+        const local = config ? config.local_uso || '' : '';
+        const obs = config ? config.observacao || '' : '';
+        const mod_term = config ? config.modelo_terminal || '' : '';
+        const srv_alvo = config ? config.servidor_alvo || '' : '';
+        const dataStr = config && config.data_atualizacao ? new Date(config.data_atualizacao).toLocaleDateString('pt-BR') : '—';
+
+        if (busca && !ip.includes(busca) && !usuario.toLowerCase().includes(busca) && !local.toLowerCase().includes(busca) && !obs.toLowerCase().includes(busca)) {
+          continue;
+        }
+
+        let classStatus = 'status-' + status.replace('_', '-');
+        
+        let detalhes = '—';
+        if (status === 'terminal') {
+          detalhes = `${mod_term} → ${srv_alvo}`;
+        } else if (status === 'servidor') {
+          // Checa se tá na lista global
+          const sGlobal = dadosServidores.find(s => s.ip === ip);
+          detalhes = sGlobal ? sGlobal.nome : 'Não cadastrado na lista';
+        }
+
+        html += `
+          <tr class="ip-row border-b border-[#21262d]" onclick="abrirModalIp(${i})">
+            <td class="py-3 px-6 mono text-gray-200">${ip}</td>
+            <td class="py-3 px-6 ${classStatus} font-semibold text-xs uppercase">${labelMap[status]}</td>
+            <td class="py-3 px-6 text-gray-300">${usuario || '<span class="text-gray-600">—</span>'}</td>
+            <td class="py-3 px-6 text-gray-400 text-sm">${local || '<span class="text-gray-600">—</span>'}</td>
+            <td class="py-3 px-6 text-gray-400 mono text-xs">${detalhes}</td>
+            <td class="py-3 px-6 text-gray-400 text-sm truncate max-w-[150px]">${obs || '<span class="text-gray-600">—</span>'}</td>
+            <td class="py-3 px-6 text-gray-500 text-xs">${dataStr}</td>
+          </tr>
+        `;
+      }
+      tbody.innerHTML = html;
+    }
+
+    document.getElementById('search-ip').addEventListener('input', renderizarIps);
+
+    // --- MODAL CONFIGURAÇÃO DO IP ---
+    window.abrirModalIp = function(suffix) {
+      currentSuffix = suffix;
+      document.getElementById('modal-ip-label').textContent = `10.0.4.${suffix}`;
+      
+      const config = dadosIps.find(d => d.ip_suffix === suffix);
+      
+      if (config) {
+        document.getElementById('modal-status').value = config.status;
+        document.getElementById('modal-usuario').value = config.usuario || '';
+        document.getElementById('modal-local').value = config.local_uso || '';
+        document.getElementById('modal-obs').value = config.observacao || '';
+        document.getElementById('modal-modelo-terminal').value = config.modelo_terminal || '';
+        document.getElementById('modal-servidor-alvo').value = config.servidor_alvo || '';
+      } else {
+        document.getElementById('modal-status').value = 'livre';
+        document.getElementById('modal-usuario').value = '';
+        document.getElementById('modal-local').value = '';
+        document.getElementById('modal-obs').value = '';
+        document.getElementById('modal-modelo-terminal').value = '';
+        document.getElementById('modal-servidor-alvo').value = '';
+      }
+      
+      processarCamposModalIp();
+      document.getElementById('modal-ip').classList.remove('hidden');
+    }
+
+    function processarCamposModalIp() {
+      const status = document.getElementById('modal-status').value;
+      
+      const elUser = document.getElementById('field-usuario');
+      const elLocal = document.getElementById('field-local');
+      const elObs = document.getElementById('field-observacao');
+      const secTerminal = document.getElementById('section-terminal');
+      const secServidor = document.getElementById('section-servidor');
+
+      elUser.classList.add('hidden');
+      elLocal.classList.add('hidden');
+      elObs.classList.add('hidden');
+      secTerminal.classList.add('hidden');
+      secServidor.classList.add('hidden');
+
+      if (status !== 'livre') {
+        elUser.classList.remove('hidden');
+        elLocal.classList.remove('hidden');
+        elObs.classList.remove('hidden');
+      }
+
+      if (status === 'terminal') {
+        secTerminal.classList.remove('hidden');
+      } else if (status === 'servidor') {
+        secServidor.classList.remove('hidden');
+      }
+    }
+
+    document.getElementById('modal-status').addEventListener('change', processarCamposModalIp);
+
+    document.getElementById('btn-quick-add-server').addEventListener('click', () => {
+      document.getElementById('modal-ip').classList.add('hidden');
+      abrirModalServidor();
+    });
+
+    document.getElementById('btn-salvar-ip').addEventListener('click', async () => {
+      const status = document.getElementById('modal-status').value;
+      const payload = {
+        ip_suffix: currentSuffix,
+        status: status,
+        usuario: document.getElementById('modal-usuario').value,
+        local_uso: document.getElementById('modal-local').value,
+        observacao: document.getElementById('modal-obs').value,
+        modelo_terminal: status === 'terminal' ? document.getElementById('modal-modelo-terminal').value : '',
+        servidor_alvo: status === 'terminal' ? document.getElementById('modal-servidor-alvo').value : ''
+      };
+
+      if (status === 'livre') {
+        payload.usuario = ''; payload.local_uso = ''; payload.observacao = '';
+      }
+
+      const res = await apiRequest('/api/ips', { method: 'POST', body: JSON.stringify(payload) });
+
+      if (res.ok) {
+        showToast('IP Configurado!');
+        document.getElementById('modal-ip').classList.add('hidden');
+        carregarIps();
+      }
+    });
+
+    document.getElementById('btn-limpar-ip').addEventListener('click', async () => {
+      if (confirm(`Zerar o IP 10.0.4.${currentSuffix}?`)) {
+        const res = await apiRequest(`/api/ips?suffix=${currentSuffix}`, { method: 'DELETE' });
+        if (res.ok) {
+          showToast('IP Zerado.');
+          document.getElementById('modal-ip').classList.add('hidden');
+          carregarIps();
+        }
+      }
+    });
+
+    // --- BLOCO DE NOTAS ---
+    async function carregarNotas() {
+      const res = await apiRequest('/api/notes');
+      if (res.ok) {
+        const data = await res.json();
+        document.getElementById('notepad-area').value = data.conteudo || '';
+      }
+    }
+
+    document.getElementById('save-notes-btn').addEventListener('click', async () => {
+      const conteudo = document.getElementById('notepad-area').value;
+      const res = await apiRequest('/api/notes', { method: 'POST', body: JSON.stringify({ conteudo }) });
+      if (res.ok) showToast('Anotações salvas.');
+    });
+
+    // Fechar modais
+    document.querySelectorAll('.close-modal, .close-add-modal').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.target.closest('.fixed').classList.add('hidden');
+      });
+    });
+
+    init();
+  </script>
+</body>
+</html>
