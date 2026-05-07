@@ -10,7 +10,7 @@
   <style>
     html, body { height: 100%; box-sizing: border-box; background: #0d1117; color: #e6edf3; font-family: 'Outfit', sans-serif; }
     .mono { font-family: 'JetBrains Mono', monospace; }
-    .ip-row:hover { background: #1a2332; cursor: pointer; }
+    .ip-row:hover, .estoque-row:hover { background: #1a2332; cursor: pointer; }
     .tab-btn.active { border-bottom: 2px solid #238636; color: white; }
     .status-livre { color: #4ade80; }
     .status-terminal { color: #79c0ff; }
@@ -65,7 +65,7 @@
 
     <!-- View: Mapa de IPs -->
     <div id="view-ips" class="flex-1 overflow-auto flex flex-col view-section">
-      <!-- Painel de Contadores -->
+      <!-- Painel de Contadores de IP -->
       <div class="px-6 py-3 bg-[#0d1117] border-b border-[#30363d] flex gap-4 text-xs font-medium uppercase tracking-wider flex-shrink-0">
         <div class="flex items-center gap-2"><div class="w-2 h-2 rounded-full bg-[#4ade80]"></div> Livres: <span id="count-livre">254</span></div>
         <div class="flex items-center gap-2"><div class="w-2 h-2 rounded-full bg-[#d29922]"></div> Em Uso: <span id="count-em-uso">0</span></div>
@@ -75,7 +75,7 @@
         <div class="flex items-center gap-2"><div class="w-2 h-2 rounded-full bg-[#9ca3af]"></div> Inativos: <span id="count-inativo">0</span></div>
       </div>
       
-      <!-- Controles de Busca e Filtro -->
+      <!-- Controles de Busca e Filtro de IPs -->
       <div class="px-6 py-3 bg-[#161b22] border-b border-[#30363d] flex items-center gap-4 flex-shrink-0">
         <div class="relative flex-1 max-w-md">
           <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500"></i>
@@ -112,28 +112,39 @@
     </div>
 
     <!-- View: Estoque de TI -->
-    <div id="view-estoque" class="hidden flex-1 overflow-auto p-6 view-section bg-[#0d1117]">
-      <div class="max-w-6xl mx-auto">
-        <div class="flex items-center justify-between mb-4">
-          <h2 class="text-lg font-semibold text-white">Controle de Estoque Físico</h2>
-          <button id="btn-open-add-estoque" class="bg-[#238636] hover:bg-[#2ea043] text-white px-4 py-2 rounded-lg text-sm font-medium transition flex items-center gap-2">
-            <i data-lucide="plus" class="w-4 h-4"></i> Adicionar Equipamento
-          </button>
-        </div>
-        <div class="bg-[#161b22] border border-[#30363d] rounded-lg overflow-hidden">
-          <table class="w-full text-sm">
-            <thead class="bg-[#0d1117] border-b border-[#30363d]">
-              <tr class="text-gray-500 text-xs uppercase tracking-wider text-left">
-                <th class="py-3 px-4">Tipo</th>
-                <th class="py-3 px-4">Modelo</th>
-                <th class="py-3 px-4">Nº de Série</th>
-                <th class="py-3 px-4">Status</th>
-                <th class="py-3 px-4">Observações</th>
-                <th class="py-3 px-4 text-right">Ação</th>
-              </tr>
-            </thead>
-            <tbody id="estoque-table-body"></tbody>
-          </table>
+    <div id="view-estoque" class="hidden flex-1 overflow-auto flex flex-col view-section">
+      <!-- Painel de Contadores de Estoque -->
+      <div class="px-6 py-3 bg-[#0d1117] border-b border-[#30363d] flex gap-6 text-xs font-medium uppercase tracking-wider flex-shrink-0">
+        <div class="flex items-center gap-2 text-white">Total Cadastrado: <span id="est-total" class="font-bold text-lg">0</span></div>
+        <div class="flex items-center gap-2"><div class="w-2 h-2 rounded-full bg-[#4ade80]"></div> Em Estoque: <span id="est-livre" class="font-bold">0</span></div>
+        <div class="flex items-center gap-2"><div class="w-2 h-2 rounded-full bg-[#d29922]"></div> Em Uso: <span id="est-uso" class="font-bold">0</span></div>
+        <div class="flex items-center gap-2"><div class="w-2 h-2 rounded-full bg-[#f87171]"></div> Em Manutenção: <span id="est-manu" class="font-bold">0</span></div>
+        <div class="flex items-center gap-2"><div class="w-2 h-2 rounded-full bg-[#9ca3af]"></div> Descartado/Sucata: <span id="est-desc" class="font-bold">0</span></div>
+      </div>
+
+      <div class="p-6 flex-1 overflow-auto bg-[#0d1117]">
+        <div class="max-w-6xl mx-auto">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-lg font-semibold text-white">Controle de Estoque Físico</h2>
+            <button id="btn-open-add-estoque" class="bg-[#238636] hover:bg-[#2ea043] text-white px-4 py-2 rounded-lg text-sm font-medium transition flex items-center gap-2">
+              <i data-lucide="plus" class="w-4 h-4"></i> Adicionar Equipamento
+            </button>
+          </div>
+          <div class="bg-[#161b22] border border-[#30363d] rounded-lg overflow-hidden">
+            <table class="w-full text-sm">
+              <thead class="bg-[#0d1117] border-b border-[#30363d]">
+                <tr class="text-gray-500 text-xs uppercase tracking-wider text-left">
+                  <th class="py-3 px-4">Tipo</th>
+                  <th class="py-3 px-4">Modelo</th>
+                  <th class="py-3 px-4">Nº de Série</th>
+                  <th class="py-3 px-4">Status</th>
+                  <th class="py-3 px-4">Observações</th>
+                  <th class="py-3 px-4 text-right">Ação</th>
+                </tr>
+              </thead>
+              <tbody id="estoque-table-body"></tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>
@@ -383,7 +394,7 @@
       }
       lucide.createIcons();
       toast.classList.remove('hidden');
-      setTimeout(() => toast.classList.add('hidden'), 3000);
+      setTimeout(() => toast.classList.add('hidden'), 4000);
     }
 
     document.getElementById('login-btn').addEventListener('click', () => {
@@ -437,11 +448,18 @@
 
     // --- FERRAMENTAS: SERVIDORES E MODELOS ---
     async function carregarServidores() {
-      const res = await apiRequest('/api/servers');
-      if (res.ok) {
-        dadosServidores = await res.json();
-        renderizarListaServidores();
-        atualizarDropdownServidores();
+      try {
+        const res = await apiRequest('/api/servers');
+        if (res.ok) {
+          dadosServidores = await res.json() || [];
+          renderizarListaServidores();
+          atualizarDropdownServidores();
+        } else {
+          showToast('Erro ao carregar Servidores do banco', 'error');
+        }
+      } catch(e) {
+        console.error(e);
+        showToast('Erro de conexão com a API de Servidores', 'error');
       }
     }
 
@@ -466,12 +484,14 @@
     }
 
     async function carregarModelos() {
-      const res = await apiRequest('/api/models');
-      if (res.ok) {
-        dadosModelos = await res.json();
-        renderizarListaModelos();
-        atualizarDropdownModelos();
-      }
+      try {
+        const res = await apiRequest('/api/models');
+        if (res.ok) {
+          dadosModelos = await res.json() || [];
+          renderizarListaModelos();
+          atualizarDropdownModelos();
+        }
+      } catch(e) { console.error(e); }
     }
 
     function renderizarListaModelos() {
@@ -488,7 +508,6 @@
       lucide.createIcons();
     }
 
-    // Botões de Adicionar Ferramentas (Event Listeners corrigidos)
     document.getElementById('btn-open-add-server').addEventListener('click', () => {
       document.getElementById('add-server-ip').value = currentSuffix ? `10.0.4.${currentSuffix}` : '';
       document.getElementById('add-server-nome').value = '';
@@ -511,7 +530,7 @@
         showToast('Servidor salvo na lista!');
         document.getElementById('modal-add-server').classList.add('hidden');
         carregarServidores();
-        carregarIps(); // Atualiza a tabela de ips para mostrar o nome se o ip estiver lá
+        carregarIps();
       }
     });
 
@@ -544,10 +563,17 @@
 
     // --- ESTOQUE DE TI ---
     async function carregarEstoque() {
-      const res = await apiRequest('/api/estoque');
-      if (res.ok) {
-        dadosEstoque = await res.json();
-        renderizarEstoque();
+      try {
+        const res = await apiRequest('/api/estoque');
+        if (res.ok) {
+          dadosEstoque = await res.json() || [];
+          renderizarEstoque();
+        } else {
+          showToast('Erro ao carregar o Estoque do banco', 'error');
+        }
+      } catch(e) {
+        console.error(e);
+        showToast('Erro de conexão com Estoque', 'error');
       }
     }
 
@@ -557,24 +583,41 @@
       const stMap = {
         'em_estoque': '<span class="text-[#4ade80]">Em Estoque</span>',
         'em_uso': '<span class="text-[#d29922]">Em Uso</span>',
-        'manutencao': '<span class="text-[#f87171]">Em Manutenção</span>',
+        'manutencao': '<span class="text-[#f87171]">Manutenção</span>',
         'descartado': '<span class="text-[#9ca3af]">Descartado</span>'
       };
 
-      tbody.innerHTML = dadosEstoque.map(e => `
-        <tr class="border-b border-[#21262d] hover:bg-[#1a2332]">
-          <td class="py-3 px-4 font-medium text-gray-200">${e.tipo_equipamento}</td>
-          <td class="py-3 px-4 text-gray-300">${e.modelo}</td>
-          <td class="py-3 px-4 mono text-gray-400 text-xs">${e.numero_serie || 'N/A'}</td>
-          <td class="py-3 px-4 text-xs font-semibold uppercase">${stMap[e.status]}</td>
-          <td class="py-3 px-4 text-gray-400 text-xs truncate max-w-[150px]">${e.observacoes || ''}</td>
-          <td class="py-3 px-4 text-right">
-            <button onclick="abrirModalEstoque(${e.id})" class="text-[#60a5fa] hover:text-blue-400 mr-2"><i data-lucide="edit-2" class="w-4 h-4"></i></button>
-            <button onclick="deletarEstoque(${e.id})" class="text-red-500 hover:text-red-400"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
-          </td>
-        </tr>
-      `).join('');
+      let cntEstoque = 0, cntUso = 0, cntManu = 0, cntDesc = 0;
+
+      let html = '';
+      dadosEstoque.forEach(e => {
+        if(e.status === 'em_estoque') cntEstoque++;
+        if(e.status === 'em_uso') cntUso++;
+        if(e.status === 'manutencao') cntManu++;
+        if(e.status === 'descartado') cntDesc++;
+
+        html += `
+          <tr class="estoque-row border-b border-[#21262d]" onclick="abrirModalEstoque(${e.id})">
+            <td class="py-3 px-4 font-medium text-gray-200">${e.tipo_equipamento}</td>
+            <td class="py-3 px-4 text-gray-300">${e.modelo}</td>
+            <td class="py-3 px-4 mono text-gray-400 text-xs">${e.numero_serie || 'N/A'}</td>
+            <td class="py-3 px-4 text-xs font-semibold uppercase">${stMap[e.status]}</td>
+            <td class="py-3 px-4 text-gray-400 text-xs truncate max-w-[150px]">${e.observacoes || ''}</td>
+            <td class="py-3 px-4 text-right">
+              <button onclick="event.stopPropagation(); deletarEstoque(${e.id})" class="text-red-500 hover:text-red-400"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+            </td>
+          </tr>
+        `;
+      });
+      tbody.innerHTML = html;
       lucide.createIcons();
+
+      // Atualiza painel superior do estoque
+      document.getElementById('est-total').textContent = dadosEstoque.length;
+      document.getElementById('est-livre').textContent = cntEstoque;
+      document.getElementById('est-uso').textContent = cntUso;
+      document.getElementById('est-manu').textContent = cntManu;
+      document.getElementById('est-desc').textContent = cntDesc;
     }
 
     document.getElementById('btn-open-add-estoque').addEventListener('click', () => { abrirModalEstoque(null); });
@@ -587,9 +630,9 @@
         document.getElementById('estoque-id').value = item.id;
         document.getElementById('estoque-tipo').value = item.tipo_equipamento;
         document.getElementById('estoque-modelo').value = item.modelo;
-        document.getElementById('estoque-sn').value = item.numero_serie;
+        document.getElementById('estoque-sn').value = item.numero_serie || '';
         document.getElementById('estoque-status').value = item.status;
-        document.getElementById('estoque-obs').value = item.observacoes;
+        document.getElementById('estoque-obs').value = item.observacoes || '';
       } else {
         document.getElementById('modal-estoque-title').textContent = 'Cadastrar Equipamento';
         document.getElementById('estoque-id').value = '';
@@ -620,6 +663,8 @@
         showToast('Equipamento salvo!');
         document.getElementById('modal-estoque').classList.add('hidden');
         carregarEstoque();
+      } else {
+        showToast('Erro ao salvar no banco', 'error');
       }
     });
 
@@ -632,9 +677,21 @@
 
     // --- MAPA DE IPS E CONTADORES ---
     async function carregarIps() {
-      const res = await apiRequest('/api/ips');
-      if (res.ok) {
-        dadosIps = await res.json();
+      try {
+        const res = await apiRequest('/api/ips');
+        if (res.ok) {
+          dadosIps = await res.json() || [];
+          renderizarIps();
+        } else {
+          showToast('Erro ao carregar IPs do banco. Verifique as tabelas.', 'error');
+          // Permite que o for loop desenhe os 254 itens vazios mesmo assim
+          dadosIps = []; 
+          renderizarIps();
+        }
+      } catch(e) {
+        console.error(e);
+        showToast('Erro de conexão ao carregar mapa de IPs', 'error');
+        dadosIps = [];
         renderizarIps();
       }
     }
@@ -695,7 +752,7 @@
       
       tbody.innerHTML = html;
       
-      // Atualiza painel superior
+      // Atualiza painel superior dos IPs
       document.getElementById('count-livre').textContent = counts.livre;
       document.getElementById('count-em-uso').textContent = counts.em_uso;
       document.getElementById('count-terminal').textContent = counts.terminal;
@@ -787,6 +844,8 @@
         showToast('IP Configurado!');
         document.getElementById('modal-ip').classList.add('hidden');
         carregarIps();
+      } else {
+        showToast('Falha ao salvar IP no banco', 'error');
       }
     });
 
@@ -803,11 +862,13 @@
 
     // --- BLOCO DE NOTAS ---
     async function carregarNotas() {
-      const res = await apiRequest('/api/notes');
-      if (res.ok) {
-        const data = await res.json();
-        document.getElementById('notepad-area').value = data.conteudo || '';
-      }
+      try {
+        const res = await apiRequest('/api/notes');
+        if (res.ok) {
+          const data = await res.json();
+          document.getElementById('notepad-area').value = data.conteudo || '';
+        }
+      } catch(e) { console.error(e); }
     }
 
     document.getElementById('save-notes-btn').addEventListener('click', async () => {
