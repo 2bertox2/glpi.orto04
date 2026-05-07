@@ -58,18 +58,42 @@
 
     <div class="bg-[#161b22] border-b border-[#30363d] px-6 flex gap-6 flex-shrink-0">
       <button class="tab-btn active py-3 text-sm font-medium text-gray-400 hover:text-white" data-target="view-ips"><i data-lucide="table" class="inline w-4 h-4 mr-2"></i>Mapa de IPs</button>
+      <button class="tab-btn py-3 text-sm font-medium text-gray-400 hover:text-white" data-target="view-estoque"><i data-lucide="package" class="inline w-4 h-4 mr-2"></i>Estoque de TI</button>
       <button class="tab-btn py-3 text-sm font-medium text-gray-400 hover:text-white" data-target="view-tools"><i data-lucide="settings" class="inline w-4 h-4 mr-2"></i>Ferramentas & Cadastros</button>
       <button class="tab-btn py-3 text-sm font-medium text-gray-400 hover:text-white" data-target="view-notes"><i data-lucide="book-open" class="inline w-4 h-4 mr-2"></i>Agenda e Notas</button>
     </div>
 
     <!-- View: Mapa de IPs -->
     <div id="view-ips" class="flex-1 overflow-auto flex flex-col view-section">
+      <!-- Painel de Contadores -->
+      <div class="px-6 py-3 bg-[#0d1117] border-b border-[#30363d] flex gap-4 text-xs font-medium uppercase tracking-wider flex-shrink-0">
+        <div class="flex items-center gap-2"><div class="w-2 h-2 rounded-full bg-[#4ade80]"></div> Livres: <span id="count-livre">254</span></div>
+        <div class="flex items-center gap-2"><div class="w-2 h-2 rounded-full bg-[#d29922]"></div> Em Uso: <span id="count-em-uso">0</span></div>
+        <div class="flex items-center gap-2"><div class="w-2 h-2 rounded-full bg-[#79c0ff]"></div> Terminais: <span id="count-terminal">0</span></div>
+        <div class="flex items-center gap-2"><div class="w-2 h-2 rounded-full bg-[#f87171]"></div> Servidores: <span id="count-servidor">0</span></div>
+        <div class="flex items-center gap-2"><div class="w-2 h-2 rounded-full bg-[#a78bfa]"></div> Reservados: <span id="count-reservado">0</span></div>
+        <div class="flex items-center gap-2"><div class="w-2 h-2 rounded-full bg-[#9ca3af]"></div> Inativos: <span id="count-inativo">0</span></div>
+      </div>
+      
+      <!-- Controles de Busca e Filtro -->
       <div class="px-6 py-3 bg-[#161b22] border-b border-[#30363d] flex items-center gap-4 flex-shrink-0">
         <div class="relative flex-1 max-w-md">
           <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500"></i>
-          <input id="search-ip" type="text" placeholder="Buscar no mapa de IPs..." class="w-full bg-[#0d1117] border border-[#30363d] rounded-lg pl-10 pr-4 py-2 text-sm focus:outline-none focus:border-[#238636]">
+          <input id="search-ip" type="text" placeholder="Buscar IP, usuário, local..." class="w-full bg-[#0d1117] border border-[#30363d] rounded-lg pl-10 pr-4 py-2 text-sm focus:outline-none focus:border-[#238636]">
+        </div>
+        <div>
+          <select id="filter-ip-status" class="bg-[#0d1117] border border-[#30363d] rounded-lg px-4 py-2 text-sm text-white focus:outline-none focus:border-[#238636]">
+            <option value="all">Todos os Status</option>
+            <option value="livre">Livres</option>
+            <option value="em_uso">Em uso</option>
+            <option value="terminal">Terminais</option>
+            <option value="servidor">Servidores</option>
+            <option value="reservado">Reservados</option>
+            <option value="inativo">Inativos</option>
+          </select>
         </div>
       </div>
+
       <div class="flex-1 overflow-auto">
         <table class="w-full text-sm">
           <thead class="sticky top-0 bg-[#0d1117] z-10 border-b border-[#30363d]">
@@ -80,11 +104,37 @@
               <th class="text-left py-3 px-6 w-[150px]">Local</th>
               <th class="text-left py-3 px-6 w-[180px]">Detalhes Técnicos</th>
               <th class="text-left py-3 px-6 flex-1">Observações</th>
-              <th class="text-left py-3 px-6 w-[120px]">Última Edição</th>
             </tr>
           </thead>
           <tbody id="ip-table-body"></tbody>
         </table>
+      </div>
+    </div>
+
+    <!-- View: Estoque de TI -->
+    <div id="view-estoque" class="hidden flex-1 overflow-auto p-6 view-section bg-[#0d1117]">
+      <div class="max-w-6xl mx-auto">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-lg font-semibold text-white">Controle de Estoque Físico</h2>
+          <button id="btn-open-add-estoque" class="bg-[#238636] hover:bg-[#2ea043] text-white px-4 py-2 rounded-lg text-sm font-medium transition flex items-center gap-2">
+            <i data-lucide="plus" class="w-4 h-4"></i> Adicionar Equipamento
+          </button>
+        </div>
+        <div class="bg-[#161b22] border border-[#30363d] rounded-lg overflow-hidden">
+          <table class="w-full text-sm">
+            <thead class="bg-[#0d1117] border-b border-[#30363d]">
+              <tr class="text-gray-500 text-xs uppercase tracking-wider text-left">
+                <th class="py-3 px-4">Tipo</th>
+                <th class="py-3 px-4">Modelo</th>
+                <th class="py-3 px-4">Nº de Série</th>
+                <th class="py-3 px-4">Status</th>
+                <th class="py-3 px-4">Observações</th>
+                <th class="py-3 px-4 text-right">Ação</th>
+              </tr>
+            </thead>
+            <tbody id="estoque-table-body"></tbody>
+          </table>
+        </div>
       </div>
     </div>
 
@@ -96,7 +146,7 @@
         <div>
           <div class="flex items-center justify-between mb-4">
             <h2 class="text-lg font-semibold text-white">Servidores da Rede</h2>
-            <button onclick="abrirModalServidor()" class="bg-[#238636] hover:bg-[#2ea043] text-white px-3 py-1.5 rounded-lg text-sm font-medium transition flex items-center gap-2">
+            <button id="btn-open-add-server" class="bg-[#238636] hover:bg-[#2ea043] text-white px-3 py-1.5 rounded-lg text-sm font-medium transition flex items-center gap-2">
               <i data-lucide="plus" class="w-4 h-4"></i> Adicionar
             </button>
           </div>
@@ -118,7 +168,7 @@
         <div>
           <div class="flex items-center justify-between mb-4">
             <h2 class="text-lg font-semibold text-white">Modelos de Terminal</h2>
-            <button onclick="abrirModalModelo()" class="bg-[#238636] hover:bg-[#2ea043] text-white px-3 py-1.5 rounded-lg text-sm font-medium transition flex items-center gap-2">
+            <button id="btn-open-add-model" class="bg-[#238636] hover:bg-[#2ea043] text-white px-3 py-1.5 rounded-lg text-sm font-medium transition flex items-center gap-2">
               <i data-lucide="plus" class="w-4 h-4"></i> Adicionar
             </button>
           </div>
@@ -153,18 +203,15 @@
     </div>
   </div>
 
-  <!-- MODAL: Configurar IP Principal -->
+  <!-- MODAL: Configurar IP -->
   <div id="modal-ip" class="hidden fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4">
     <div class="bg-[#161b22] border border-[#30363d] rounded-xl w-full max-w-md p-6" onclick="event.stopPropagation()">
       <div class="flex items-center justify-between mb-6">
         <h2 class="text-lg font-semibold text-white">Configurar IP</h2>
         <button class="close-modal text-gray-500 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
       </div>
-      
       <p id="modal-ip-label" class="mono text-[#238636] font-bold text-xl mb-4"></p>
-      
       <div class="space-y-4">
-        <!-- Status Geral -->
         <div>
           <label class="block text-xs text-gray-400 mb-1">Status</label>
           <select id="modal-status" class="w-full bg-[#0d1117] border border-[#30363d] rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#238636]">
@@ -176,57 +223,44 @@
             <option value="reservado">Reservado</option>
           </select>
         </div>
-
-        <!-- Inputs Dinâmicos: Usuário e Local (Aparece para a maioria, exceto Livre) -->
         <div id="field-usuario" class="hidden">
           <label class="block text-xs text-gray-400 mb-1">Usuário / Responsável</label>
-          <input id="modal-usuario" type="text" placeholder="Ex: João - Faturamento" class="w-full bg-[#0d1117] border border-[#30363d] rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#238636]">
+          <input id="modal-usuario" type="text" class="w-full bg-[#0d1117] border border-[#30363d] rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#238636]">
         </div>
         <div id="field-local" class="hidden">
           <label class="block text-xs text-gray-400 mb-1">Local / Setor</label>
-          <input id="modal-local" type="text" placeholder="Ex: Sala RH" class="w-full bg-[#0d1117] border border-[#30363d] rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#238636]">
+          <input id="modal-local" type="text" class="w-full bg-[#0d1117] border border-[#30363d] rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#238636]">
         </div>
-
-        <!-- Secção Específica: Terminal -->
         <div id="section-terminal" class="hidden p-3 bg-[#0d1117] border border-[#30363d] rounded-lg space-y-3">
           <p class="text-xs text-gray-500 uppercase font-semibold">Detalhes do Terminal</p>
           <div>
             <label class="block text-xs text-gray-400 mb-1">Modelo do Terminal</label>
-            <select id="modal-modelo-terminal" class="w-full bg-[#161b22] border border-[#30363d] rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#238636]">
-              <option value="">Selecione o modelo...</option>
-            </select>
+            <select id="modal-modelo-terminal" class="w-full bg-[#161b22] border border-[#30363d] rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#238636]"></select>
           </div>
           <div>
             <label class="block text-xs text-gray-400 mb-1">Servidor Alocado (Conexão)</label>
-            <select id="modal-servidor-alvo" class="w-full bg-[#161b22] border border-[#30363d] rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#238636]">
-              <option value="">Selecione o servidor...</option>
-            </select>
+            <select id="modal-servidor-alvo" class="w-full bg-[#161b22] border border-[#30363d] rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#238636]"></select>
           </div>
         </div>
-
-        <!-- Secção Específica: Servidor (Caixa Rápida) -->
         <div id="section-servidor" class="hidden p-3 bg-[#0d1117] border border-[#30363d] rounded-lg">
-          <p class="text-xs text-gray-500 mb-2">Este IP está marcado como Servidor.</p>
+          <p class="text-xs text-gray-500 mb-2">IP marcado como Servidor.</p>
           <button id="btn-quick-add-server" class="w-full bg-[#30363d] hover:bg-[#21262d] text-white py-2 rounded-lg text-sm transition flex items-center justify-center gap-2 border border-gray-600">
             <i data-lucide="server" class="w-4 h-4"></i> Cadastrar na Lista Global de Servidores
           </button>
         </div>
-
-        <!-- Observações (Sempre aparece exceto Livre) -->
         <div id="field-observacao" class="hidden">
           <label class="block text-xs text-gray-400 mb-1">Observações Gerais</label>
-          <textarea id="modal-obs" rows="3" placeholder="Detalhes adicionais..." class="w-full bg-[#0d1117] border border-[#30363d] rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#238636] resize-none"></textarea>
+          <textarea id="modal-obs" rows="3" class="w-full bg-[#0d1117] border border-[#30363d] rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#238636] resize-none"></textarea>
         </div>
       </div>
-
       <div class="flex gap-3 mt-6">
-        <button id="btn-salvar-ip" class="flex-1 bg-[#238636] hover:bg-[#2ea043] text-white font-medium py-2 rounded-lg text-sm transition">Salvar Configuração</button>
+        <button id="btn-salvar-ip" class="flex-1 bg-[#238636] hover:bg-[#2ea043] text-white font-medium py-2 rounded-lg text-sm transition">Salvar</button>
         <button id="btn-limpar-ip" class="px-4 bg-[#21262d] border border-[#30363d] hover:bg-[#da3633] hover:border-[#da3633] text-gray-300 hover:text-white font-medium py-2 rounded-lg text-sm transition">Zerar IP</button>
       </div>
     </div>
   </div>
 
-  <!-- MODAL: Adicionar Servidor (Global) -->
+  <!-- MODAL: Adicionar Servidor -->
   <div id="modal-add-server" class="hidden fixed inset-0 bg-black/70 z-[60] flex items-center justify-center p-4">
     <div class="bg-[#161b22] border border-[#30363d] rounded-xl w-full max-w-sm p-6" onclick="event.stopPropagation()">
       <div class="flex items-center justify-between mb-4">
@@ -247,7 +281,7 @@
     </div>
   </div>
 
-  <!-- MODAL: Adicionar Modelo (Global) -->
+  <!-- MODAL: Adicionar Modelo -->
   <div id="modal-add-model" class="hidden fixed inset-0 bg-black/70 z-[60] flex items-center justify-center p-4">
     <div class="bg-[#161b22] border border-[#30363d] rounded-xl w-full max-w-sm p-6" onclick="event.stopPropagation()">
       <div class="flex items-center justify-between mb-4">
@@ -268,6 +302,52 @@
     </div>
   </div>
 
+  <!-- MODAL: Adicionar/Editar Estoque -->
+  <div id="modal-estoque" class="hidden fixed inset-0 bg-black/70 z-[60] flex items-center justify-center p-4">
+    <div class="bg-[#161b22] border border-[#30363d] rounded-xl w-full max-w-md p-6" onclick="event.stopPropagation()">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-lg font-semibold text-white" id="modal-estoque-title">Cadastrar Equipamento</h2>
+        <button class="close-estoque-modal text-gray-500 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+      <input type="hidden" id="estoque-id">
+      <div class="space-y-4">
+        <div>
+          <label class="block text-xs text-gray-400 mb-1">Tipo de Equipamento</label>
+          <select id="estoque-tipo" class="w-full bg-[#0d1117] border border-[#30363d] rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#238636]">
+            <option value="Terminal">Terminal</option>
+            <option value="Switch">Switch</option>
+            <option value="Roteador">Roteador</option>
+            <option value="Servidor">Servidor</option>
+            <option value="Impressora">Impressora</option>
+            <option value="Outros">Outros</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs text-gray-400 mb-1">Modelo</label>
+          <input id="estoque-modelo" type="text" class="w-full bg-[#0d1117] border border-[#30363d] rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#238636]">
+        </div>
+        <div>
+          <label class="block text-xs text-gray-400 mb-1">Número de Série (S/N)</label>
+          <input id="estoque-sn" type="text" class="w-full bg-[#0d1117] border border-[#30363d] rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#238636]">
+        </div>
+        <div>
+          <label class="block text-xs text-gray-400 mb-1">Status</label>
+          <select id="estoque-status" class="w-full bg-[#0d1117] border border-[#30363d] rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#238636]">
+            <option value="em_estoque">Em Estoque (Livre)</option>
+            <option value="em_uso">Em Uso na Rede</option>
+            <option value="manutencao">Em Manutenção</option>
+            <option value="descartado">Descartado/Sucata</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs text-gray-400 mb-1">Observações</label>
+          <textarea id="estoque-obs" rows="2" class="w-full bg-[#0d1117] border border-[#30363d] rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#238636] resize-none"></textarea>
+        </div>
+        <button id="submit-estoque" class="w-full bg-[#238636] hover:bg-[#2ea043] text-white font-medium py-2 rounded-lg text-sm transition mt-2">Salvar Equipamento</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Notificação -->
   <div id="toast" class="fixed bottom-4 right-4 bg-[#161b22] border border-[#30363d] rounded-lg px-4 py-3 text-sm text-white hidden z-[200] shadow-xl flex items-center gap-2 transition-opacity">
     <i id="toast-icon" data-lucide="info" class="w-4 h-4"></i> <span id="toast-msg"></span>
@@ -278,6 +358,7 @@
     let dadosIps = [];
     let dadosServidores = [];
     let dadosModelos = [];
+    let dadosEstoque = [];
     let currentSuffix = null;
 
     function init() {
@@ -337,10 +418,7 @@
     });
 
     async function apiRequest(endpoint, options = {}) {
-      const headers = {
-        'Content-Type': 'application/json',
-        'Authorization': AUTH_TOKEN
-      };
+      const headers = { 'Content-Type': 'application/json', 'Authorization': AUTH_TOKEN };
       const response = await fetch(endpoint, { ...options, headers });
       if (response.status === 401) {
         document.getElementById('logout-btn').click();
@@ -352,6 +430,7 @@
     async function carregarTudo() {
       await carregarServidores();
       await carregarModelos();
+      await carregarEstoque();
       await carregarIps();
       await carregarNotas();
     }
@@ -409,23 +488,18 @@
       lucide.createIcons();
     }
 
-    function atualizarDropdownModelos() {
-      const select = document.getElementById('modal-modelo-terminal');
-      select.innerHTML = '<option value="">Selecione o modelo...</option>' + 
-        dadosModelos.map(m => `<option value="${m.nome}">${m.nome} ${m.descricao ? ' - '+m.descricao : ''}</option>`).join('');
-    }
-
-    window.abrirModalServidor = function() {
+    // Botões de Adicionar Ferramentas (Event Listeners corrigidos)
+    document.getElementById('btn-open-add-server').addEventListener('click', () => {
       document.getElementById('add-server-ip').value = currentSuffix ? `10.0.4.${currentSuffix}` : '';
       document.getElementById('add-server-nome').value = '';
       document.getElementById('modal-add-server').classList.remove('hidden');
-    }
+    });
 
-    window.abrirModalModelo = function() {
+    document.getElementById('btn-open-add-model').addEventListener('click', () => {
       document.getElementById('add-model-nome').value = '';
       document.getElementById('add-model-desc').value = '';
       document.getElementById('modal-add-model').classList.remove('hidden');
-    }
+    });
 
     document.getElementById('submit-add-server').addEventListener('click', async () => {
       const ip = document.getElementById('add-server-ip').value;
@@ -437,6 +511,7 @@
         showToast('Servidor salvo na lista!');
         document.getElementById('modal-add-server').classList.add('hidden');
         carregarServidores();
+        carregarIps(); // Atualiza a tabela de ips para mostrar o nome se o ip estiver lá
       }
     });
 
@@ -467,7 +542,95 @@
       }
     };
 
-    // --- MAPA DE IPS ---
+    // --- ESTOQUE DE TI ---
+    async function carregarEstoque() {
+      const res = await apiRequest('/api/estoque');
+      if (res.ok) {
+        dadosEstoque = await res.json();
+        renderizarEstoque();
+      }
+    }
+
+    function renderizarEstoque() {
+      const tbody = document.getElementById('estoque-table-body');
+      
+      const stMap = {
+        'em_estoque': '<span class="text-[#4ade80]">Em Estoque</span>',
+        'em_uso': '<span class="text-[#d29922]">Em Uso</span>',
+        'manutencao': '<span class="text-[#f87171]">Em Manutenção</span>',
+        'descartado': '<span class="text-[#9ca3af]">Descartado</span>'
+      };
+
+      tbody.innerHTML = dadosEstoque.map(e => `
+        <tr class="border-b border-[#21262d] hover:bg-[#1a2332]">
+          <td class="py-3 px-4 font-medium text-gray-200">${e.tipo_equipamento}</td>
+          <td class="py-3 px-4 text-gray-300">${e.modelo}</td>
+          <td class="py-3 px-4 mono text-gray-400 text-xs">${e.numero_serie || 'N/A'}</td>
+          <td class="py-3 px-4 text-xs font-semibold uppercase">${stMap[e.status]}</td>
+          <td class="py-3 px-4 text-gray-400 text-xs truncate max-w-[150px]">${e.observacoes || ''}</td>
+          <td class="py-3 px-4 text-right">
+            <button onclick="abrirModalEstoque(${e.id})" class="text-[#60a5fa] hover:text-blue-400 mr-2"><i data-lucide="edit-2" class="w-4 h-4"></i></button>
+            <button onclick="deletarEstoque(${e.id})" class="text-red-500 hover:text-red-400"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+          </td>
+        </tr>
+      `).join('');
+      lucide.createIcons();
+    }
+
+    document.getElementById('btn-open-add-estoque').addEventListener('click', () => { abrirModalEstoque(null); });
+
+    window.abrirModalEstoque = function(id) {
+      const modal = document.getElementById('modal-estoque');
+      if (id) {
+        const item = dadosEstoque.find(e => e.id === id);
+        document.getElementById('modal-estoque-title').textContent = 'Editar Equipamento';
+        document.getElementById('estoque-id').value = item.id;
+        document.getElementById('estoque-tipo').value = item.tipo_equipamento;
+        document.getElementById('estoque-modelo').value = item.modelo;
+        document.getElementById('estoque-sn').value = item.numero_serie;
+        document.getElementById('estoque-status').value = item.status;
+        document.getElementById('estoque-obs').value = item.observacoes;
+      } else {
+        document.getElementById('modal-estoque-title').textContent = 'Cadastrar Equipamento';
+        document.getElementById('estoque-id').value = '';
+        document.getElementById('estoque-tipo').value = 'Terminal';
+        document.getElementById('estoque-modelo').value = '';
+        document.getElementById('estoque-sn').value = '';
+        document.getElementById('estoque-status').value = 'em_estoque';
+        document.getElementById('estoque-obs').value = '';
+      }
+      modal.classList.remove('hidden');
+    }
+
+    document.getElementById('submit-estoque').addEventListener('click', async () => {
+      const id = document.getElementById('estoque-id').value;
+      const payload = {
+        id: id ? parseInt(id) : null,
+        tipo_equipamento: document.getElementById('estoque-tipo').value,
+        modelo: document.getElementById('estoque-modelo').value,
+        numero_serie: document.getElementById('estoque-sn').value,
+        status: document.getElementById('estoque-status').value,
+        observacoes: document.getElementById('estoque-obs').value
+      };
+
+      if (!payload.modelo) return showToast('Preencha o modelo do equipamento', 'error');
+
+      const res = await apiRequest('/api/estoque', { method: 'POST', body: JSON.stringify(payload) });
+      if (res.ok) {
+        showToast('Equipamento salvo!');
+        document.getElementById('modal-estoque').classList.add('hidden');
+        carregarEstoque();
+      }
+    });
+
+    window.deletarEstoque = async function(id) {
+      if (confirm('Deletar equipamento do inventário?')) {
+        const res = await apiRequest(`/api/estoque?id=${id}`, { method: 'DELETE' });
+        if (res.ok) { showToast('Deletado.'); carregarEstoque(); }
+      }
+    };
+
+    // --- MAPA DE IPS E CONTADORES ---
     async function carregarIps() {
       const res = await apiRequest('/api/ips');
       if (res.ok) {
@@ -479,6 +642,7 @@
     function renderizarIps() {
       const tbody = document.getElementById('ip-table-body');
       const busca = document.getElementById('search-ip').value.toLowerCase();
+      const filtroStatus = document.getElementById('filter-ip-status').value;
       let html = '';
 
       const labelMap = {
@@ -486,17 +650,22 @@
         'inativo': 'Inativo', 'terminal': 'Terminal', 'reservado': 'Reservado'
       };
 
+      let counts = { livre: 0, em_uso: 0, servidor: 0, inativo: 0, terminal: 0, reservado: 0 };
+
       for (let i = 1; i <= 254; i++) {
         const ip = `10.0.4.${i}`;
         const config = dadosIps.find(d => d.ip_suffix === i);
-        
         const status = config ? config.status : 'livre';
+        
+        counts[status]++;
+
+        if (filtroStatus !== 'all' && status !== filtroStatus) continue;
+
         const usuario = config ? config.usuario || '' : '';
         const local = config ? config.local_uso || '' : '';
         const obs = config ? config.observacao || '' : '';
         const mod_term = config ? config.modelo_terminal || '' : '';
         const srv_alvo = config ? config.servidor_alvo || '' : '';
-        const dataStr = config && config.data_atualizacao ? new Date(config.data_atualizacao).toLocaleDateString('pt-BR') : '—';
 
         if (busca && !ip.includes(busca) && !usuario.toLowerCase().includes(busca) && !local.toLowerCase().includes(busca) && !obs.toLowerCase().includes(busca)) {
           continue;
@@ -508,7 +677,6 @@
         if (status === 'terminal') {
           detalhes = `${mod_term} → ${srv_alvo}`;
         } else if (status === 'servidor') {
-          // Checa se tá na lista global
           const sGlobal = dadosServidores.find(s => s.ip === ip);
           detalhes = sGlobal ? sGlobal.nome : 'Não cadastrado na lista';
         }
@@ -520,21 +688,29 @@
             <td class="py-3 px-6 text-gray-300">${usuario || '<span class="text-gray-600">—</span>'}</td>
             <td class="py-3 px-6 text-gray-400 text-sm">${local || '<span class="text-gray-600">—</span>'}</td>
             <td class="py-3 px-6 text-gray-400 mono text-xs">${detalhes}</td>
-            <td class="py-3 px-6 text-gray-400 text-sm truncate max-w-[150px]">${obs || '<span class="text-gray-600">—</span>'}</td>
-            <td class="py-3 px-6 text-gray-500 text-xs">${dataStr}</td>
+            <td class="py-3 px-6 text-gray-400 text-sm truncate max-w-[200px]">${obs || '<span class="text-gray-600">—</span>'}</td>
           </tr>
         `;
       }
+      
       tbody.innerHTML = html;
+      
+      // Atualiza painel superior
+      document.getElementById('count-livre').textContent = counts.livre;
+      document.getElementById('count-em-uso').textContent = counts.em_uso;
+      document.getElementById('count-terminal').textContent = counts.terminal;
+      document.getElementById('count-servidor').textContent = counts.servidor;
+      document.getElementById('count-reservado').textContent = counts.reservado;
+      document.getElementById('count-inativo').textContent = counts.inativo;
     }
 
     document.getElementById('search-ip').addEventListener('input', renderizarIps);
+    document.getElementById('filter-ip-status').addEventListener('change', renderizarIps);
 
     // --- MODAL CONFIGURAÇÃO DO IP ---
     window.abrirModalIp = function(suffix) {
       currentSuffix = suffix;
       document.getElementById('modal-ip-label').textContent = `10.0.4.${suffix}`;
-      
       const config = dadosIps.find(d => d.ip_suffix === suffix);
       
       if (config) {
@@ -559,7 +735,6 @@
 
     function processarCamposModalIp() {
       const status = document.getElementById('modal-status').value;
-      
       const elUser = document.getElementById('field-usuario');
       const elLocal = document.getElementById('field-local');
       const elObs = document.getElementById('field-observacao');
@@ -577,19 +752,17 @@
         elLocal.classList.remove('hidden');
         elObs.classList.remove('hidden');
       }
-
-      if (status === 'terminal') {
-        secTerminal.classList.remove('hidden');
-      } else if (status === 'servidor') {
-        secServidor.classList.remove('hidden');
-      }
+      if (status === 'terminal') { secTerminal.classList.remove('hidden'); } 
+      else if (status === 'servidor') { secServidor.classList.remove('hidden'); }
     }
 
     document.getElementById('modal-status').addEventListener('change', processarCamposModalIp);
 
     document.getElementById('btn-quick-add-server').addEventListener('click', () => {
       document.getElementById('modal-ip').classList.add('hidden');
-      abrirModalServidor();
+      document.getElementById('add-server-ip').value = `10.0.4.${currentSuffix}`;
+      document.getElementById('add-server-nome').value = '';
+      document.getElementById('modal-add-server').classList.remove('hidden');
     });
 
     document.getElementById('btn-salvar-ip').addEventListener('click', async () => {
@@ -644,7 +817,7 @@
     });
 
     // Fechar modais
-    document.querySelectorAll('.close-modal, .close-add-modal').forEach(btn => {
+    document.querySelectorAll('.close-modal, .close-add-modal, .close-estoque-modal').forEach(btn => {
       btn.addEventListener('click', (e) => {
         e.target.closest('.fixed').classList.add('hidden');
       });
