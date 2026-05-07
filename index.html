@@ -34,7 +34,7 @@
       <h2 class="text-2xl font-bold text-white mb-2">Acesso Restrito TI</h2>
       <p class="text-gray-400 text-sm mb-6">Insira a credencial padrão para acessar.</p>
       <input id="password-input" type="password" placeholder="Senha de acesso" class="w-full bg-[#0d1117] border border-[#30363d] rounded-lg px-4 py-3 text-center text-white focus:outline-none focus:border-[#238636] mb-4">
-      <button id="login-btn" class="w-full bg-[#238636] hover:bg-[#2ea043] text-white font-semibold py-3 rounded-lg transition">Entrar no Sistema</button>
+      <button onclick="fazerLogin()" class="w-full bg-[#238636] hover:bg-[#2ea043] text-white font-semibold py-3 rounded-lg transition">Entrar no Sistema</button>
       <p id="login-error" class="text-red-500 text-sm mt-3 hidden">Senha incorreta. Acesso negado.</p>
     </div>
   </div>
@@ -51,21 +51,21 @@
           <p class="text-sm text-gray-400 mono">Sub-rede: 10.0.4.1/254</p>
         </div>
       </div>
-      <button id="logout-btn" class="text-gray-400 hover:text-white transition flex items-center gap-2 text-sm">
+      <button onclick="fazerLogout()" class="text-gray-400 hover:text-white transition flex items-center gap-2 text-sm">
         <i data-lucide="log-out" class="w-4 h-4"></i> Sair
       </button>
     </header>
 
     <div class="bg-[#161b22] border-b border-[#30363d] px-6 flex gap-6 flex-shrink-0">
-      <button class="tab-btn active py-3 text-sm font-medium text-gray-400 hover:text-white" data-target="view-ips"><i data-lucide="table" class="inline w-4 h-4 mr-2"></i>Mapa de IPs</button>
-      <button class="tab-btn py-3 text-sm font-medium text-gray-400 hover:text-white" data-target="view-estoque"><i data-lucide="package" class="inline w-4 h-4 mr-2"></i>Estoque de TI</button>
-      <button class="tab-btn py-3 text-sm font-medium text-gray-400 hover:text-white" data-target="view-tools"><i data-lucide="settings" class="inline w-4 h-4 mr-2"></i>Ferramentas & Cadastros</button>
-      <button class="tab-btn py-3 text-sm font-medium text-gray-400 hover:text-white" data-target="view-notes"><i data-lucide="book-open" class="inline w-4 h-4 mr-2"></i>Agenda e Notas</button>
+      <button class="tab-btn active py-3 text-sm font-medium text-gray-400 hover:text-white" onclick="mudarAba(this, 'view-ips')"><i data-lucide="table" class="inline w-4 h-4 mr-2"></i>Mapa de IPs</button>
+      <button class="tab-btn py-3 text-sm font-medium text-gray-400 hover:text-white" onclick="mudarAba(this, 'view-estoque')"><i data-lucide="package" class="inline w-4 h-4 mr-2"></i>Estoque de TI</button>
+      <button class="tab-btn py-3 text-sm font-medium text-gray-400 hover:text-white" onclick="mudarAba(this, 'view-tools')"><i data-lucide="settings" class="inline w-4 h-4 mr-2"></i>Ferramentas & Cadastros</button>
+      <button class="tab-btn py-3 text-sm font-medium text-gray-400 hover:text-white" onclick="mudarAba(this, 'view-notes')"><i data-lucide="book-open" class="inline w-4 h-4 mr-2"></i>Agenda e Notas</button>
     </div>
 
     <!-- View: Mapa de IPs -->
     <div id="view-ips" class="flex-1 overflow-auto flex flex-col view-section">
-      <!-- Painel de Contadores de IP -->
+      <!-- Painel de Contadores -->
       <div class="px-6 py-3 bg-[#0d1117] border-b border-[#30363d] flex gap-4 text-xs font-medium uppercase tracking-wider flex-shrink-0">
         <div class="flex items-center gap-2"><div class="w-2 h-2 rounded-full bg-[#4ade80]"></div> Livres: <span id="count-livre">254</span></div>
         <div class="flex items-center gap-2"><div class="w-2 h-2 rounded-full bg-[#d29922]"></div> Em Uso: <span id="count-em-uso">0</span></div>
@@ -75,14 +75,13 @@
         <div class="flex items-center gap-2"><div class="w-2 h-2 rounded-full bg-[#9ca3af]"></div> Inativos: <span id="count-inativo">0</span></div>
       </div>
       
-      <!-- Controles de Busca e Filtro de IPs -->
       <div class="px-6 py-3 bg-[#161b22] border-b border-[#30363d] flex items-center gap-4 flex-shrink-0">
         <div class="relative flex-1 max-w-md">
           <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500"></i>
-          <input id="search-ip" type="text" placeholder="Buscar IP, usuário, local..." class="w-full bg-[#0d1117] border border-[#30363d] rounded-lg pl-10 pr-4 py-2 text-sm focus:outline-none focus:border-[#238636]">
+          <input id="search-ip" type="text" oninput="renderizarIps()" placeholder="Buscar IP, usuário, local..." class="w-full bg-[#0d1117] border border-[#30363d] rounded-lg pl-10 pr-4 py-2 text-sm focus:outline-none focus:border-[#238636]">
         </div>
         <div>
-          <select id="filter-ip-status" class="bg-[#0d1117] border border-[#30363d] rounded-lg px-4 py-2 text-sm text-white focus:outline-none focus:border-[#238636]">
+          <select id="filter-ip-status" onchange="renderizarIps()" class="bg-[#0d1117] border border-[#30363d] rounded-lg px-4 py-2 text-sm text-white focus:outline-none focus:border-[#238636]">
             <option value="all">Todos os Status</option>
             <option value="livre">Livres</option>
             <option value="em_uso">Em uso</option>
@@ -113,20 +112,19 @@
 
     <!-- View: Estoque de TI -->
     <div id="view-estoque" class="hidden flex-1 overflow-auto flex flex-col view-section">
-      <!-- Painel de Contadores de Estoque -->
       <div class="px-6 py-3 bg-[#0d1117] border-b border-[#30363d] flex gap-6 text-xs font-medium uppercase tracking-wider flex-shrink-0">
         <div class="flex items-center gap-2 text-white">Total Cadastrado: <span id="est-total" class="font-bold text-lg">0</span></div>
         <div class="flex items-center gap-2"><div class="w-2 h-2 rounded-full bg-[#4ade80]"></div> Em Estoque: <span id="est-livre" class="font-bold">0</span></div>
         <div class="flex items-center gap-2"><div class="w-2 h-2 rounded-full bg-[#d29922]"></div> Em Uso: <span id="est-uso" class="font-bold">0</span></div>
         <div class="flex items-center gap-2"><div class="w-2 h-2 rounded-full bg-[#f87171]"></div> Em Manutenção: <span id="est-manu" class="font-bold">0</span></div>
-        <div class="flex items-center gap-2"><div class="w-2 h-2 rounded-full bg-[#9ca3af]"></div> Descartado/Sucata: <span id="est-desc" class="font-bold">0</span></div>
+        <div class="flex items-center gap-2"><div class="w-2 h-2 rounded-full bg-[#9ca3af]"></div> Descartado: <span id="est-desc" class="font-bold">0</span></div>
       </div>
 
       <div class="p-6 flex-1 overflow-auto bg-[#0d1117]">
         <div class="max-w-6xl mx-auto">
           <div class="flex items-center justify-between mb-4">
             <h2 class="text-lg font-semibold text-white">Controle de Estoque Físico</h2>
-            <button id="btn-open-add-estoque" class="bg-[#238636] hover:bg-[#2ea043] text-white px-4 py-2 rounded-lg text-sm font-medium transition flex items-center gap-2">
+            <button onclick="abrirModalEstoque()" class="bg-[#238636] hover:bg-[#2ea043] text-white px-4 py-2 rounded-lg text-sm font-medium transition flex items-center gap-2">
               <i data-lucide="plus" class="w-4 h-4"></i> Adicionar Equipamento
             </button>
           </div>
@@ -157,7 +155,7 @@
         <div>
           <div class="flex items-center justify-between mb-4">
             <h2 class="text-lg font-semibold text-white">Servidores da Rede</h2>
-            <button id="btn-open-add-server" class="bg-[#238636] hover:bg-[#2ea043] text-white px-3 py-1.5 rounded-lg text-sm font-medium transition flex items-center gap-2">
+            <button onclick="abrirModalAddServidor()" class="bg-[#238636] hover:bg-[#2ea043] text-white px-3 py-1.5 rounded-lg text-sm font-medium transition flex items-center gap-2">
               <i data-lucide="plus" class="w-4 h-4"></i> Adicionar
             </button>
           </div>
@@ -179,7 +177,7 @@
         <div>
           <div class="flex items-center justify-between mb-4">
             <h2 class="text-lg font-semibold text-white">Modelos de Terminal</h2>
-            <button id="btn-open-add-model" class="bg-[#238636] hover:bg-[#2ea043] text-white px-3 py-1.5 rounded-lg text-sm font-medium transition flex items-center gap-2">
+            <button onclick="abrirModalAddModelo()" class="bg-[#238636] hover:bg-[#2ea043] text-white px-3 py-1.5 rounded-lg text-sm font-medium transition flex items-center gap-2">
               <i data-lucide="plus" class="w-4 h-4"></i> Adicionar
             </button>
           </div>
@@ -205,7 +203,7 @@
       <div class="max-w-5xl mx-auto w-full flex-1 flex flex-col">
         <div class="flex items-center justify-between mb-4">
           <h2 class="text-lg font-semibold text-white">Agenda e Anotações da Equipe</h2>
-          <button id="save-notes-btn" class="bg-[#238636] hover:bg-[#2ea043] text-white px-4 py-2 rounded-lg text-sm font-medium transition flex items-center gap-2">
+          <button onclick="salvarNotas(this)" class="bg-[#238636] hover:bg-[#2ea043] text-white px-4 py-2 rounded-lg text-sm font-medium transition flex items-center gap-2">
             <i data-lucide="save" class="w-4 h-4"></i> Salvar Anotações
           </button>
         </div>
@@ -219,13 +217,13 @@
     <div class="bg-[#161b22] border border-[#30363d] rounded-xl w-full max-w-md p-6" onclick="event.stopPropagation()">
       <div class="flex items-center justify-between mb-6">
         <h2 class="text-lg font-semibold text-white">Configurar IP</h2>
-        <button class="close-modal text-gray-500 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
+        <button onclick="fecharModal('modal-ip')" class="text-gray-500 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
       </div>
       <p id="modal-ip-label" class="mono text-[#238636] font-bold text-xl mb-4"></p>
       <div class="space-y-4">
         <div>
           <label class="block text-xs text-gray-400 mb-1">Status</label>
-          <select id="modal-status" class="w-full bg-[#0d1117] border border-[#30363d] rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#238636]">
+          <select id="modal-status" onchange="processarCamposModalIp()" class="w-full bg-[#0d1117] border border-[#30363d] rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#238636]">
             <option value="livre">Livre</option>
             <option value="em_uso">Em uso</option>
             <option value="servidor">Servidor</option>
@@ -255,7 +253,7 @@
         </div>
         <div id="section-servidor" class="hidden p-3 bg-[#0d1117] border border-[#30363d] rounded-lg">
           <p class="text-xs text-gray-500 mb-2">IP marcado como Servidor.</p>
-          <button id="btn-quick-add-server" class="w-full bg-[#30363d] hover:bg-[#21262d] text-white py-2 rounded-lg text-sm transition flex items-center justify-center gap-2 border border-gray-600">
+          <button onclick="prepararNovoServidor()" class="w-full bg-[#30363d] hover:bg-[#21262d] text-white py-2 rounded-lg text-sm transition flex items-center justify-center gap-2 border border-gray-600">
             <i data-lucide="server" class="w-4 h-4"></i> Cadastrar na Lista Global de Servidores
           </button>
         </div>
@@ -265,8 +263,8 @@
         </div>
       </div>
       <div class="flex gap-3 mt-6">
-        <button id="btn-salvar-ip" class="flex-1 bg-[#238636] hover:bg-[#2ea043] text-white font-medium py-2 rounded-lg text-sm transition">Salvar</button>
-        <button id="btn-limpar-ip" class="px-4 bg-[#21262d] border border-[#30363d] hover:bg-[#da3633] hover:border-[#da3633] text-gray-300 hover:text-white font-medium py-2 rounded-lg text-sm transition">Zerar IP</button>
+        <button onclick="salvarIp(this)" class="flex-1 bg-[#238636] hover:bg-[#2ea043] text-white font-medium py-2 rounded-lg text-sm transition">Salvar</button>
+        <button onclick="limparIp(this)" class="px-4 bg-[#21262d] border border-[#30363d] hover:bg-[#da3633] hover:border-[#da3633] text-gray-300 hover:text-white font-medium py-2 rounded-lg text-sm transition">Zerar IP</button>
       </div>
     </div>
   </div>
@@ -276,7 +274,7 @@
     <div class="bg-[#161b22] border border-[#30363d] rounded-xl w-full max-w-sm p-6" onclick="event.stopPropagation()">
       <div class="flex items-center justify-between mb-4">
         <h2 class="text-lg font-semibold text-white">Cadastrar Servidor</h2>
-        <button class="close-add-modal text-gray-500 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
+        <button onclick="fecharModal('modal-add-server')" class="text-gray-500 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
       </div>
       <div class="space-y-4">
         <div>
@@ -287,7 +285,7 @@
           <label class="block text-xs text-gray-400 mb-1">Nome do Servidor</label>
           <input id="add-server-nome" type="text" placeholder="Ex: Servidor AD" class="w-full bg-[#0d1117] border border-[#30363d] rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#238636]">
         </div>
-        <button id="submit-add-server" class="w-full bg-[#238636] hover:bg-[#2ea043] text-white font-medium py-2 rounded-lg text-sm transition mt-2">Salvar na Lista</button>
+        <button onclick="salvarServidorGlobal(this)" class="w-full bg-[#238636] hover:bg-[#2ea043] text-white font-medium py-2 rounded-lg text-sm transition mt-2">Salvar na Lista</button>
       </div>
     </div>
   </div>
@@ -297,7 +295,7 @@
     <div class="bg-[#161b22] border border-[#30363d] rounded-xl w-full max-w-sm p-6" onclick="event.stopPropagation()">
       <div class="flex items-center justify-between mb-4">
         <h2 class="text-lg font-semibold text-white">Cadastrar Modelo</h2>
-        <button class="close-add-modal text-gray-500 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
+        <button onclick="fecharModal('modal-add-model')" class="text-gray-500 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
       </div>
       <div class="space-y-4">
         <div>
@@ -308,7 +306,7 @@
           <label class="block text-xs text-gray-400 mb-1">Descrição</label>
           <input id="add-model-desc" type="text" placeholder="Ex: Sem suporte ao 2016" class="w-full bg-[#0d1117] border border-[#30363d] rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#238636]">
         </div>
-        <button id="submit-add-model" class="w-full bg-[#238636] hover:bg-[#2ea043] text-white font-medium py-2 rounded-lg text-sm transition mt-2">Salvar Modelo</button>
+        <button onclick="salvarModeloGlobal(this)" class="w-full bg-[#238636] hover:bg-[#2ea043] text-white font-medium py-2 rounded-lg text-sm transition mt-2">Salvar Modelo</button>
       </div>
     </div>
   </div>
@@ -318,7 +316,7 @@
     <div class="bg-[#161b22] border border-[#30363d] rounded-xl w-full max-w-md p-6" onclick="event.stopPropagation()">
       <div class="flex items-center justify-between mb-4">
         <h2 class="text-lg font-semibold text-white" id="modal-estoque-title">Cadastrar Equipamento</h2>
-        <button class="close-estoque-modal text-gray-500 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
+        <button onclick="fecharModal('modal-estoque')" class="text-gray-500 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
       </div>
       <input type="hidden" id="estoque-id">
       <div class="space-y-4">
@@ -354,7 +352,7 @@
           <label class="block text-xs text-gray-400 mb-1">Observações</label>
           <textarea id="estoque-obs" rows="2" class="w-full bg-[#0d1117] border border-[#30363d] rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#238636] resize-none"></textarea>
         </div>
-        <button id="submit-estoque" class="w-full bg-[#238636] hover:bg-[#2ea043] text-white font-medium py-2 rounded-lg text-sm transition mt-2">Salvar Equipamento</button>
+        <button onclick="salvarEstoque(this)" class="w-full bg-[#238636] hover:bg-[#2ea043] text-white font-medium py-2 rounded-lg text-sm transition mt-2">Salvar Equipamento</button>
       </div>
     </div>
   </div>
@@ -397,7 +395,7 @@
       setTimeout(() => toast.classList.add('hidden'), 4000);
     }
 
-    document.getElementById('login-btn').addEventListener('click', () => {
+    window.fazerLogin = function() {
       const pass = document.getElementById('password-input').value;
       if (pass === 'orto0421@') {
         AUTH_TOKEN = pass;
@@ -409,30 +407,39 @@
       } else {
         document.getElementById('login-error').classList.remove('hidden');
       }
-    });
+    };
 
-    document.getElementById('logout-btn').addEventListener('click', () => {
+    window.fazerLogout = function() {
       AUTH_TOKEN = '';
       localStorage.removeItem('ortobom_auth');
       document.getElementById('app').classList.add('hidden');
       document.getElementById('login-overlay').classList.remove('hidden');
       document.getElementById('password-input').value = '';
-    });
+    };
 
-    document.querySelectorAll('.tab-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        document.querySelectorAll('.view-section').forEach(v => v.classList.add('hidden'));
-        document.getElementById(btn.dataset.target).classList.remove('hidden');
+    window.mudarAba = function(btnElement, targetId) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      btnElement.classList.add('active');
+      document.querySelectorAll('.view-section').forEach(v => v.classList.add('hidden'));
+      document.getElementById(targetId).classList.remove('hidden');
+    };
+
+    window.fecharModal = function(id) {
+      document.getElementById(id).classList.add('hidden');
+    };
+
+    window.onclick = function(event) {
+      const modais = ['modal-ip', 'modal-add-server', 'modal-add-model', 'modal-estoque'];
+      modais.forEach(m => {
+        if (event.target.id === m) fecharModal(m);
       });
-    });
+    };
 
     async function apiRequest(endpoint, options = {}) {
       const headers = { 'Content-Type': 'application/json', 'Authorization': AUTH_TOKEN };
       const response = await fetch(endpoint, { ...options, headers });
       if (response.status === 401) {
-        document.getElementById('logout-btn').click();
+        fazerLogout();
         throw new Error('Não autorizado');
       }
       return response;
@@ -455,12 +462,9 @@
           renderizarListaServidores();
           atualizarDropdownServidores();
         } else {
-          showToast('Erro ao carregar Servidores do banco', 'error');
+          showToast('Erro ao carregar Servidores. Tabela existe?', 'error');
         }
-      } catch(e) {
-        console.error(e);
-        showToast('Erro de conexão com a API de Servidores', 'error');
-      }
+      } catch(e) { console.error(e); }
     }
 
     function renderizarListaServidores() {
@@ -508,44 +512,54 @@
       lucide.createIcons();
     }
 
-    document.getElementById('btn-open-add-server').addEventListener('click', () => {
+    window.abrirModalAddServidor = function() {
       document.getElementById('add-server-ip').value = currentSuffix ? `10.0.4.${currentSuffix}` : '';
       document.getElementById('add-server-nome').value = '';
       document.getElementById('modal-add-server').classList.remove('hidden');
-    });
+    }
 
-    document.getElementById('btn-open-add-model').addEventListener('click', () => {
+    window.abrirModalAddModelo = function() {
       document.getElementById('add-model-nome').value = '';
       document.getElementById('add-model-desc').value = '';
       document.getElementById('modal-add-model').classList.remove('hidden');
-    });
+    }
 
-    document.getElementById('submit-add-server').addEventListener('click', async () => {
-      const ip = document.getElementById('add-server-ip').value;
-      const nome = document.getElementById('add-server-nome').value;
+    window.salvarServidorGlobal = async function(btn) {
+      const ip = document.getElementById('add-server-ip').value.trim();
+      const nome = document.getElementById('add-server-nome').value.trim();
       if (!ip || !nome) return showToast('Preencha IP e Nome', 'error');
       
-      const res = await apiRequest('/api/servers', { method: 'POST', body: JSON.stringify({ ip, nome, tipo: 'acessivel' }) });
-      if (res.ok) {
-        showToast('Servidor salvo na lista!');
-        document.getElementById('modal-add-server').classList.add('hidden');
-        carregarServidores();
-        carregarIps();
-      }
-    });
+      const oldText = btn.innerText; btn.innerText = 'Salvando...'; btn.disabled = true;
+      try {
+        const res = await apiRequest('/api/servers', { method: 'POST', body: JSON.stringify({ ip, nome, tipo: 'acessivel' }) });
+        if (res.ok) {
+          showToast('Servidor salvo na lista!');
+          fecharModal('modal-add-server');
+          carregarServidores();
+          carregarIps();
+        } else {
+          showToast('Erro ao salvar. Verifique se o IP já existe.', 'error');
+        }
+      } catch(e) { showToast('Erro de conexão.', 'error'); }
+      btn.innerText = oldText; btn.disabled = false;
+    }
 
-    document.getElementById('submit-add-model').addEventListener('click', async () => {
-      const nome = document.getElementById('add-model-nome').value;
-      const desc = document.getElementById('add-model-desc').value;
+    window.salvarModeloGlobal = async function(btn) {
+      const nome = document.getElementById('add-model-nome').value.trim();
+      const desc = document.getElementById('add-model-desc').value.trim();
       if (!nome) return showToast('Preencha o Nome do Modelo', 'error');
       
-      const res = await apiRequest('/api/models', { method: 'POST', body: JSON.stringify({ nome, descricao: desc }) });
-      if (res.ok) {
-        showToast('Modelo salvo!');
-        document.getElementById('modal-add-model').classList.add('hidden');
-        carregarModelos();
-      }
-    });
+      const oldText = btn.innerText; btn.innerText = 'Salvando...'; btn.disabled = true;
+      try {
+        const res = await apiRequest('/api/models', { method: 'POST', body: JSON.stringify({ nome, descricao: desc }) });
+        if (res.ok) {
+          showToast('Modelo salvo!');
+          fecharModal('modal-add-model');
+          carregarModelos();
+        } else { showToast('Erro ao salvar.', 'error'); }
+      } catch(e) { showToast('Erro de conexão.', 'error'); }
+      btn.innerText = oldText; btn.disabled = false;
+    }
 
     window.deletarServidor = async function(id) {
       if (confirm('Deletar servidor da lista global?')) {
@@ -568,18 +582,12 @@
         if (res.ok) {
           dadosEstoque = await res.json() || [];
           renderizarEstoque();
-        } else {
-          showToast('Erro ao carregar o Estoque do banco', 'error');
         }
-      } catch(e) {
-        console.error(e);
-        showToast('Erro de conexão com Estoque', 'error');
-      }
+      } catch(e) { console.error(e); }
     }
 
     function renderizarEstoque() {
       const tbody = document.getElementById('estoque-table-body');
-      
       const stMap = {
         'em_estoque': '<span class="text-[#4ade80]">Em Estoque</span>',
         'em_uso': '<span class="text-[#d29922]">Em Uso</span>',
@@ -588,8 +596,8 @@
       };
 
       let cntEstoque = 0, cntUso = 0, cntManu = 0, cntDesc = 0;
-
       let html = '';
+      
       dadosEstoque.forEach(e => {
         if(e.status === 'em_estoque') cntEstoque++;
         if(e.status === 'em_uso') cntUso++;
@@ -609,10 +617,10 @@
           </tr>
         `;
       });
+      
       tbody.innerHTML = html;
       lucide.createIcons();
 
-      // Atualiza painel superior do estoque
       document.getElementById('est-total').textContent = dadosEstoque.length;
       document.getElementById('est-livre').textContent = cntEstoque;
       document.getElementById('est-uso').textContent = cntUso;
@@ -620,10 +628,7 @@
       document.getElementById('est-desc').textContent = cntDesc;
     }
 
-    document.getElementById('btn-open-add-estoque').addEventListener('click', () => { abrirModalEstoque(null); });
-
-    window.abrirModalEstoque = function(id) {
-      const modal = document.getElementById('modal-estoque');
+    window.abrirModalEstoque = function(id = null) {
       if (id) {
         const item = dadosEstoque.find(e => e.id === id);
         document.getElementById('modal-estoque-title').textContent = 'Editar Equipamento';
@@ -642,31 +647,33 @@
         document.getElementById('estoque-status').value = 'em_estoque';
         document.getElementById('estoque-obs').value = '';
       }
-      modal.classList.remove('hidden');
+      document.getElementById('modal-estoque').classList.remove('hidden');
     }
 
-    document.getElementById('submit-estoque').addEventListener('click', async () => {
+    window.salvarEstoque = async function(btn) {
       const id = document.getElementById('estoque-id').value;
       const payload = {
         id: id ? parseInt(id) : null,
         tipo_equipamento: document.getElementById('estoque-tipo').value,
-        modelo: document.getElementById('estoque-modelo').value,
-        numero_serie: document.getElementById('estoque-sn').value,
+        modelo: document.getElementById('estoque-modelo').value.trim(),
+        numero_serie: document.getElementById('estoque-sn').value.trim(),
         status: document.getElementById('estoque-status').value,
-        observacoes: document.getElementById('estoque-obs').value
+        observacoes: document.getElementById('estoque-obs').value.trim()
       };
 
       if (!payload.modelo) return showToast('Preencha o modelo do equipamento', 'error');
 
-      const res = await apiRequest('/api/estoque', { method: 'POST', body: JSON.stringify(payload) });
-      if (res.ok) {
-        showToast('Equipamento salvo!');
-        document.getElementById('modal-estoque').classList.add('hidden');
-        carregarEstoque();
-      } else {
-        showToast('Erro ao salvar no banco', 'error');
-      }
-    });
+      const oldText = btn.innerText; btn.innerText = 'Salvando...'; btn.disabled = true;
+      try {
+        const res = await apiRequest('/api/estoque', { method: 'POST', body: JSON.stringify(payload) });
+        if (res.ok) {
+          showToast('Equipamento salvo!');
+          fecharModal('modal-estoque');
+          carregarEstoque();
+        } else { showToast('Erro ao salvar no banco', 'error'); }
+      } catch(e) { showToast('Erro de conexão', 'error'); }
+      btn.innerText = oldText; btn.disabled = false;
+    }
 
     window.deletarEstoque = async function(id) {
       if (confirm('Deletar equipamento do inventário?')) {
@@ -681,22 +688,18 @@
         const res = await apiRequest('/api/ips');
         if (res.ok) {
           dadosIps = await res.json() || [];
-          renderizarIps();
         } else {
           showToast('Erro ao carregar IPs do banco. Verifique as tabelas.', 'error');
-          // Permite que o for loop desenhe os 254 itens vazios mesmo assim
           dadosIps = []; 
-          renderizarIps();
         }
       } catch(e) {
         console.error(e);
-        showToast('Erro de conexão ao carregar mapa de IPs', 'error');
         dadosIps = [];
-        renderizarIps();
       }
+      renderizarIps();
     }
 
-    function renderizarIps() {
+    window.renderizarIps = function() {
       const tbody = document.getElementById('ip-table-body');
       const busca = document.getElementById('search-ip').value.toLowerCase();
       const filtroStatus = document.getElementById('filter-ip-status').value;
@@ -752,7 +755,6 @@
       
       tbody.innerHTML = html;
       
-      // Atualiza painel superior dos IPs
       document.getElementById('count-livre').textContent = counts.livre;
       document.getElementById('count-em-uso').textContent = counts.em_uso;
       document.getElementById('count-terminal').textContent = counts.terminal;
@@ -761,10 +763,6 @@
       document.getElementById('count-inativo').textContent = counts.inativo;
     }
 
-    document.getElementById('search-ip').addEventListener('input', renderizarIps);
-    document.getElementById('filter-ip-status').addEventListener('change', renderizarIps);
-
-    // --- MODAL CONFIGURAÇÃO DO IP ---
     window.abrirModalIp = function(suffix) {
       currentSuffix = suffix;
       document.getElementById('modal-ip-label').textContent = `10.0.4.${suffix}`;
@@ -790,7 +788,7 @@
       document.getElementById('modal-ip').classList.remove('hidden');
     }
 
-    function processarCamposModalIp() {
+    window.processarCamposModalIp = function() {
       const status = document.getElementById('modal-status').value;
       const elUser = document.getElementById('field-usuario');
       const elLocal = document.getElementById('field-local');
@@ -798,38 +796,30 @@
       const secTerminal = document.getElementById('section-terminal');
       const secServidor = document.getElementById('section-servidor');
 
-      elUser.classList.add('hidden');
-      elLocal.classList.add('hidden');
-      elObs.classList.add('hidden');
-      secTerminal.classList.add('hidden');
+      elUser.classList.add('hidden'); elLocal.classList.add('hidden');
+      elObs.classList.add('hidden'); secTerminal.classList.add('hidden');
       secServidor.classList.add('hidden');
 
       if (status !== 'livre') {
-        elUser.classList.remove('hidden');
-        elLocal.classList.remove('hidden');
-        elObs.classList.remove('hidden');
+        elUser.classList.remove('hidden'); elLocal.classList.remove('hidden'); elObs.classList.remove('hidden');
       }
       if (status === 'terminal') { secTerminal.classList.remove('hidden'); } 
       else if (status === 'servidor') { secServidor.classList.remove('hidden'); }
     }
 
-    document.getElementById('modal-status').addEventListener('change', processarCamposModalIp);
+    window.prepararNovoServidor = function() {
+      fecharModal('modal-ip');
+      abrirModalAddServidor();
+    }
 
-    document.getElementById('btn-quick-add-server').addEventListener('click', () => {
-      document.getElementById('modal-ip').classList.add('hidden');
-      document.getElementById('add-server-ip').value = `10.0.4.${currentSuffix}`;
-      document.getElementById('add-server-nome').value = '';
-      document.getElementById('modal-add-server').classList.remove('hidden');
-    });
-
-    document.getElementById('btn-salvar-ip').addEventListener('click', async () => {
+    window.salvarIp = async function(btn) {
       const status = document.getElementById('modal-status').value;
       const payload = {
         ip_suffix: currentSuffix,
         status: status,
-        usuario: document.getElementById('modal-usuario').value,
-        local_uso: document.getElementById('modal-local').value,
-        observacao: document.getElementById('modal-obs').value,
+        usuario: document.getElementById('modal-usuario').value.trim(),
+        local_uso: document.getElementById('modal-local').value.trim(),
+        observacao: document.getElementById('modal-obs').value.trim(),
         modelo_terminal: status === 'terminal' ? document.getElementById('modal-modelo-terminal').value : '',
         servidor_alvo: status === 'terminal' ? document.getElementById('modal-servidor-alvo').value : ''
       };
@@ -838,27 +828,32 @@
         payload.usuario = ''; payload.local_uso = ''; payload.observacao = '';
       }
 
-      const res = await apiRequest('/api/ips', { method: 'POST', body: JSON.stringify(payload) });
-
-      if (res.ok) {
-        showToast('IP Configurado!');
-        document.getElementById('modal-ip').classList.add('hidden');
-        carregarIps();
-      } else {
-        showToast('Falha ao salvar IP no banco', 'error');
-      }
-    });
-
-    document.getElementById('btn-limpar-ip').addEventListener('click', async () => {
-      if (confirm(`Zerar o IP 10.0.4.${currentSuffix}?`)) {
-        const res = await apiRequest(`/api/ips?suffix=${currentSuffix}`, { method: 'DELETE' });
+      const oldText = btn.innerText; btn.innerText = 'Salvando...'; btn.disabled = true;
+      try {
+        const res = await apiRequest('/api/ips', { method: 'POST', body: JSON.stringify(payload) });
         if (res.ok) {
-          showToast('IP Zerado.');
-          document.getElementById('modal-ip').classList.add('hidden');
+          showToast('IP Configurado!');
+          fecharModal('modal-ip');
           carregarIps();
-        }
+        } else { showToast('Falha ao salvar IP no banco', 'error'); }
+      } catch(e) { showToast('Erro de conexão', 'error'); }
+      btn.innerText = oldText; btn.disabled = false;
+    }
+
+    window.limparIp = async function(btn) {
+      if (confirm(`Zerar o IP 10.0.4.${currentSuffix}?`)) {
+        const oldText = btn.innerText; btn.innerText = 'Zerando...'; btn.disabled = true;
+        try {
+          const res = await apiRequest(`/api/ips?suffix=${currentSuffix}`, { method: 'DELETE' });
+          if (res.ok) {
+            showToast('IP Zerado.');
+            fecharModal('modal-ip');
+            carregarIps();
+          }
+        } catch(e) { showToast('Erro de conexão', 'error'); }
+        btn.innerText = oldText; btn.disabled = false;
       }
-    });
+    }
 
     // --- BLOCO DE NOTAS ---
     async function carregarNotas() {
@@ -871,18 +866,15 @@
       } catch(e) { console.error(e); }
     }
 
-    document.getElementById('save-notes-btn').addEventListener('click', async () => {
+    window.salvarNotas = async function(btn) {
       const conteudo = document.getElementById('notepad-area').value;
-      const res = await apiRequest('/api/notes', { method: 'POST', body: JSON.stringify({ conteudo }) });
-      if (res.ok) showToast('Anotações salvas.');
-    });
-
-    // Fechar modais
-    document.querySelectorAll('.close-modal, .close-add-modal, .close-estoque-modal').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        e.target.closest('.fixed').classList.add('hidden');
-      });
-    });
+      const oldText = btn.innerText; btn.innerText = 'Salvando...'; btn.disabled = true;
+      try {
+        const res = await apiRequest('/api/notes', { method: 'POST', body: JSON.stringify({ conteudo }) });
+        if (res.ok) showToast('Anotações salvas.');
+      } catch(e) { showToast('Erro de conexão', 'error'); }
+      btn.innerText = oldText; btn.disabled = false;
+    }
 
     init();
   </script>
