@@ -150,7 +150,6 @@
     <!-- View: Ferramentas & Cadastros Globais -->
     <div id="view-tools" class="hidden flex-1 overflow-auto p-6 view-section bg-[#0d1117]">
       <div class="max-w-6xl mx-auto grid grid-cols-2 gap-8">
-        
         <!-- Bloco Servidores -->
         <div>
           <div class="flex items-center justify-between mb-4">
@@ -194,7 +193,6 @@
             </table>
           </div>
         </div>
-
       </div>
     </div>
 
@@ -445,6 +443,15 @@
       return response;
     }
 
+    async function processarResposta(res) {
+      try {
+        const data = await res.json();
+        return Array.isArray(data) ? data : [];
+      } catch (e) {
+        return [];
+      }
+    }
+
     async function carregarTudo() {
       await carregarServidores();
       await carregarModelos();
@@ -458,11 +465,9 @@
       try {
         const res = await apiRequest('/api/servers');
         if (res.ok) {
-          dadosServidores = await res.json() || [];
+          dadosServidores = await processarResposta(res);
           renderizarListaServidores();
           atualizarDropdownServidores();
-        } else {
-          showToast('Erro ao carregar Servidores. Tabela existe?', 'error');
         }
       } catch(e) { console.error(e); }
     }
@@ -491,7 +496,7 @@
       try {
         const res = await apiRequest('/api/models');
         if (res.ok) {
-          dadosModelos = await res.json() || [];
+          dadosModelos = await processarResposta(res);
           renderizarListaModelos();
           atualizarDropdownModelos();
         }
@@ -537,9 +542,7 @@
           fecharModal('modal-add-server');
           carregarServidores();
           carregarIps();
-        } else {
-          showToast('Erro ao salvar. Verifique se o IP já existe.', 'error');
-        }
+        } else { showToast('Erro ao salvar no banco.', 'error'); }
       } catch(e) { showToast('Erro de conexão.', 'error'); }
       btn.innerText = oldText; btn.disabled = false;
     }
@@ -580,7 +583,7 @@
       try {
         const res = await apiRequest('/api/estoque');
         if (res.ok) {
-          dadosEstoque = await res.json() || [];
+          dadosEstoque = await processarResposta(res);
           renderizarEstoque();
         }
       } catch(e) { console.error(e); }
@@ -687,11 +690,8 @@
       try {
         const res = await apiRequest('/api/ips');
         if (res.ok) {
-          dadosIps = await res.json() || [];
-        } else {
-          showToast('Erro ao carregar IPs do banco. Verifique as tabelas.', 'error');
-          dadosIps = []; 
-        }
+          dadosIps = await processarResposta(res);
+        } else { dadosIps = []; }
       } catch(e) {
         console.error(e);
         dadosIps = [];
