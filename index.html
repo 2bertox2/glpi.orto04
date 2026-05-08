@@ -65,7 +65,6 @@
 
     <!-- View: Mapa de IPs -->
     <div id="view-ips" class="flex-1 overflow-auto flex flex-col view-section">
-      <!-- Painel de Contadores -->
       <div class="px-6 py-3 bg-[#0d1117] border-b border-[#30363d] flex gap-4 text-xs font-medium uppercase tracking-wider flex-shrink-0">
         <div class="flex items-center gap-2"><div class="w-2 h-2 rounded-full bg-[#4ade80]"></div> Livres: <span id="count-livre">254</span></div>
         <div class="flex items-center gap-2"><div class="w-2 h-2 rounded-full bg-[#d29922]"></div> Em Uso: <span id="count-em-uso">0</span></div>
@@ -153,7 +152,7 @@
         <!-- Bloco Servidores -->
         <div>
           <div class="flex items-center justify-between mb-4">
-            <h2 class="text-lg font-semibold text-white">Servidores da Rede</h2>
+            <h2 class="text-lg font-semibold text-white">Lista de Servidores</h2>
             <button onclick="abrirModalAddServidor()" class="bg-[#238636] hover:bg-[#2ea043] text-white px-3 py-1.5 rounded-lg text-sm font-medium transition flex items-center gap-2">
               <i data-lucide="plus" class="w-4 h-4"></i> Adicionar
             </button>
@@ -162,8 +161,8 @@
             <table class="w-full text-sm">
               <thead class="bg-[#0d1117] border-b border-[#30363d]">
                 <tr class="text-gray-500 text-xs uppercase tracking-wider text-left">
-                  <th class="py-3 px-4">IP</th>
-                  <th class="py-3 px-4">Nome</th>
+                  <th class="py-3 px-4">Nome do Servidor</th>
+                  <th class="py-3 px-4">Descrição</th>
                   <th class="py-3 px-4 text-right">Ação</th>
                 </tr>
               </thead>
@@ -250,10 +249,7 @@
           </div>
         </div>
         <div id="section-servidor" class="hidden p-3 bg-[#0d1117] border border-[#30363d] rounded-lg">
-          <p class="text-xs text-gray-500 mb-2">IP marcado como Servidor.</p>
-          <button onclick="prepararNovoServidor()" class="w-full bg-[#30363d] hover:bg-[#21262d] text-white py-2 rounded-lg text-sm transition flex items-center justify-center gap-2 border border-gray-600">
-            <i data-lucide="server" class="w-4 h-4"></i> Cadastrar na Lista Global de Servidores
-          </button>
+          <p class="text-xs text-gray-400">Este IP está marcado como Servidor. Use o campo Observações abaixo para inserir o nome ou detalhes dele.</p>
         </div>
         <div id="field-observacao" class="hidden">
           <label class="block text-xs text-gray-400 mb-1">Observações Gerais</label>
@@ -267,7 +263,7 @@
     </div>
   </div>
 
-  <!-- MODAL: Adicionar Servidor -->
+  <!-- MODAL: Adicionar Servidor (Catalogo) -->
   <div id="modal-add-server" class="hidden fixed inset-0 bg-black/70 z-[60] flex items-center justify-center p-4">
     <div class="bg-[#161b22] border border-[#30363d] rounded-xl w-full max-w-sm p-6" onclick="event.stopPropagation()">
       <div class="flex items-center justify-between mb-4">
@@ -276,14 +272,14 @@
       </div>
       <div class="space-y-4">
         <div>
-          <label class="block text-xs text-gray-400 mb-1">Endereço IP</label>
-          <input id="add-server-ip" type="text" placeholder="Ex: 10.0.4.200" class="w-full bg-[#0d1117] border border-[#30363d] rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#238636]">
+          <label class="block text-xs text-gray-400 mb-1">Nome do Servidor</label>
+          <input id="add-server-nome" type="text" placeholder="Ex: Servidor 2016" class="w-full bg-[#0d1117] border border-[#30363d] rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#238636]">
         </div>
         <div>
-          <label class="block text-xs text-gray-400 mb-1">Nome do Servidor</label>
-          <input id="add-server-nome" type="text" placeholder="Ex: Servidor AD" class="w-full bg-[#0d1117] border border-[#30363d] rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#238636]">
+          <label class="block text-xs text-gray-400 mb-1">Descrição</label>
+          <input id="add-server-desc" type="text" placeholder="Ex: Servidor de Sistemas" class="w-full bg-[#0d1117] border border-[#30363d] rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#238636]">
         </div>
-        <button onclick="salvarServidorGlobal(this)" class="w-full bg-[#238636] hover:bg-[#2ea043] text-white font-medium py-2 rounded-lg text-sm transition mt-2">Salvar na Lista</button>
+        <button onclick="salvarServidorGlobal(this)" class="w-full bg-[#238636] hover:bg-[#2ea043] text-white font-medium py-2 rounded-lg text-sm transition mt-2">Salvar no Catálogo</button>
       </div>
     </div>
   </div>
@@ -476,8 +472,8 @@
       const tbody = document.getElementById('servers-table-body');
       tbody.innerHTML = dadosServidores.map(s => `
         <tr class="border-b border-[#21262d] hover:bg-[#1a2332]">
-          <td class="py-2 px-4 mono text-[#60a5fa]">${s.ip}</td>
-          <td class="py-2 px-4 text-gray-200">${s.nome}</td>
+          <td class="py-2 px-4 text-[#60a5fa] font-medium">${s.nome}</td>
+          <td class="py-2 px-4 text-gray-400 text-xs">${s.descricao || ''}</td>
           <td class="py-2 px-4 text-right">
             <button onclick="deletarServidor(${s.id})" class="text-red-500 hover:text-red-400"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
           </td>
@@ -489,7 +485,7 @@
     function atualizarDropdownServidores() {
       const select = document.getElementById('modal-servidor-alvo');
       select.innerHTML = '<option value="">Selecione o servidor...</option>' + 
-        dadosServidores.map(s => `<option value="${s.ip}">${s.nome} (${s.ip})</option>`).join('');
+        dadosServidores.map(s => `<option value="${s.nome}">${s.nome} ${s.descricao ? '- ' + s.descricao : ''}</option>`).join('');
     }
 
     async function carregarModelos() {
@@ -518,8 +514,8 @@
     }
 
     window.abrirModalAddServidor = function() {
-      document.getElementById('add-server-ip').value = currentSuffix ? `10.0.4.${currentSuffix}` : '';
       document.getElementById('add-server-nome').value = '';
+      document.getElementById('add-server-desc').value = '';
       document.getElementById('modal-add-server').classList.remove('hidden');
     }
 
@@ -530,19 +526,18 @@
     }
 
     window.salvarServidorGlobal = async function(btn) {
-      const ip = document.getElementById('add-server-ip').value.trim();
       const nome = document.getElementById('add-server-nome').value.trim();
-      if (!ip || !nome) return showToast('Preencha IP e Nome', 'error');
+      const desc = document.getElementById('add-server-desc').value.trim();
+      if (!nome) return showToast('Preencha o Nome do Servidor', 'error');
       
       const oldText = btn.innerText; btn.innerText = 'Salvando...'; btn.disabled = true;
       try {
-        const res = await apiRequest('/api/servers', { method: 'POST', body: JSON.stringify({ ip, nome, tipo: 'acessivel' }) });
+        const res = await apiRequest('/api/servers', { method: 'POST', body: JSON.stringify({ nome, descricao: desc }) });
         if (res.ok) {
-          showToast('Servidor salvo na lista!');
+          showToast('Servidor salvo no catálogo!');
           fecharModal('modal-add-server');
           carregarServidores();
-          carregarIps();
-        } else { showToast('Erro ao salvar no banco.', 'error'); }
+        } else { showToast('Erro ao salvar. Nome já existe?', 'error'); }
       } catch(e) { showToast('Erro de conexão.', 'error'); }
       btn.innerText = oldText; btn.disabled = false;
     }
@@ -736,9 +731,6 @@
         let detalhes = '—';
         if (status === 'terminal') {
           detalhes = `${mod_term} → ${srv_alvo}`;
-        } else if (status === 'servidor') {
-          const sGlobal = dadosServidores.find(s => s.ip === ip);
-          detalhes = sGlobal ? sGlobal.nome : 'Não cadastrado na lista';
         }
 
         html += `
@@ -805,11 +797,6 @@
       }
       if (status === 'terminal') { secTerminal.classList.remove('hidden'); } 
       else if (status === 'servidor') { secServidor.classList.remove('hidden'); }
-    }
-
-    window.prepararNovoServidor = function() {
-      fecharModal('modal-ip');
-      abrirModalAddServidor();
     }
 
     window.salvarIp = async function(btn) {
