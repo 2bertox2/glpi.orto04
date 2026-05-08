@@ -17,13 +17,13 @@ module.exports = async function handler(req, res) {
       return res.status(200).json(rows);
     }
     if (method === 'POST') {
-      const { ip, nome, tipo } = req.body;
+      const { nome, descricao } = req.body;
       const query = `
-        INSERT INTO servidores (ip, nome, tipo) VALUES ($1, $2, $3)
-        ON CONFLICT (ip) DO UPDATE SET nome = EXCLUDED.nome, tipo = EXCLUDED.tipo
+        INSERT INTO servidores (nome, descricao) VALUES ($1, $2)
+        ON CONFLICT (nome) DO UPDATE SET descricao = EXCLUDED.descricao
         RETURNING *;
       `;
-      const result = await pool.query(query, [ip, nome, tipo]);
+      const result = await pool.query(query, [nome, descricao || '']);
       return res.status(200).json(result.rows[0]);
     }
     if (method === 'DELETE') {
