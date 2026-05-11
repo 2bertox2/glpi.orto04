@@ -260,7 +260,6 @@
     </div>
   </div>
 
-  
   <!-- MODAL: Adicionar Servidor (Catalogo) -->
   <div id="modal-add-server" class="hidden fixed inset-0 bg-black/70 z-[60] flex items-center justify-center p-4">
     <div class="bg-[#161b22] border border-[#30363d] rounded-xl w-full max-w-sm p-6" onclick="event.stopPropagation()">
@@ -448,6 +447,14 @@
       }
     }
 
+    async function processarResposta(res) {
+      try {
+        return Array.isArray(res) ? res : [];
+      } catch (e) {
+        return [];
+      }
+    }
+
     async function carregarTudo() {
       await carregarServidores();
       await carregarModelos();
@@ -460,7 +467,7 @@
     async function carregarServidores() {
       try {
         const data = await apiRequest('/api/servers');
-        dadosServidores = Array.isArray(data) ? data : [];
+        dadosServidores = await processarResposta(data);
         renderizarListaServidores();
         atualizarDropdownServidores();
       } catch(e) {}
@@ -489,7 +496,7 @@
     async function carregarModelos() {
       try {
         const data = await apiRequest('/api/models');
-        dadosModelos = Array.isArray(data) ? data : [];
+        dadosModelos = await processarResposta(data);
         renderizarListaModelos();
         atualizarDropdownModelos();
       } catch(e) {}
@@ -507,6 +514,14 @@
         </tr>
       `).join('');
       lucide.createIcons();
+    }
+
+    function atualizarDropdownModelos() {
+      const select = document.getElementById('modal-modelo-terminal');
+      if (select) {
+        select.innerHTML = '<option value="">Selecione o modelo...</option>' + 
+          dadosModelos.map(m => `<option value="${m.nome}">${m.nome} ${m.descricao ? '- ' + m.descricao : ''}</option>`).join('');
+      }
     }
 
     window.abrirModalAddServidor = function() {
@@ -575,7 +590,7 @@
     async function carregarEstoque() {
       try {
         const data = await apiRequest('/api/estoque');
-        dadosEstoque = Array.isArray(data) ? data : [];
+        dadosEstoque = await processarResposta(data);
         renderizarEstoque();
       } catch(e) {}
     }
@@ -681,7 +696,7 @@
     async function carregarIps() {
       try {
         const data = await apiRequest('/api/ips');
-        dadosIps = Array.isArray(data) ? data : [];
+        dadosIps = await processarResposta(data);
       } catch(e) {
         dadosIps = [];
       }
