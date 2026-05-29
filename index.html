@@ -1,4 +1,3 @@
-<!doctype html>
 <html lang="pt-BR" class="h-full">
 <head>
   <meta charset="UTF-8">
@@ -25,7 +24,7 @@
 </head>
 <body class="overflow-hidden">
 
-  <!-- Tela de Login -->
+  <!-- Aq é a tela de login -->
   <div id="login-overlay" class="fixed inset-0 bg-[#0d1117] z-[100] flex flex-col items-center justify-center p-4">
     <div class="bg-[#161b22] border border-[#30363d] rounded-xl p-8 max-w-sm w-full text-center shadow-2xl">
       <div class="w-16 h-16 mx-auto bg-gradient-to-br from-[#238636] to-[#1a6e2e] rounded-lg flex items-center justify-center mb-6">
@@ -38,7 +37,7 @@
     </div>
   </div>
 
-  <!-- Aplicação -->
+  <!-- Funcionamento da Aplicação -->
   <div id="app" class="w-full h-full flex flex-col hidden">
     <header class="bg-[#161b22] border-b border-[#30363d] px-6 py-4 flex items-center justify-between flex-shrink-0">
       <div class="flex items-center gap-4">
@@ -58,7 +57,7 @@
       <button class="tab-btn py-3 text-sm font-medium text-gray-400 hover:text-white" onclick="mudarAba(this, 'view-notes')"><i data-lucide="book-open" class="inline w-4 h-4 mr-2"></i>Agenda e Notas</button>
     </div>
 
-    <!-- View: Mapa de IPs -->
+    <!-- O Mapa de IPs -->
     <div id="view-ips" class="flex-1 overflow-auto flex flex-col view-section">
       <div class="px-6 py-3 bg-[#0d1117] border-b border-[#30363d] flex gap-4 text-xs font-medium uppercase tracking-wider flex-shrink-0">
         <div class="flex items-center gap-2"><div class="w-2 h-2 rounded-full bg-[#4ade80]"></div> Livres: <span id="count-livre">254</span></div>
@@ -104,7 +103,7 @@
       </div>
     </div>
 
-    <!-- View: Estoque de TI -->
+    <!-- Adicionar: Estoque de TI -->
     <div id="view-estoque" class="hidden flex-1 overflow-auto flex flex-col view-section">
       <div class="px-6 py-3 bg-[#0d1117] border-b border-[#30363d] flex gap-6 text-xs font-medium uppercase tracking-wider flex-shrink-0">
         <div class="flex items-center gap-2 text-white">Total Cadastrado: <span id="est-total" class="font-bold text-lg">0</span></div>
@@ -141,7 +140,7 @@
       </div>
     </div>
 
-    <!-- View: Ferramentas & Cadastros Globais -->
+    <!-- Parte de Ferramentar e cadastro -->
     <div id="view-tools" class="hidden flex-1 overflow-auto p-6 view-section bg-[#0d1117]">
       <div class="max-w-6xl mx-auto grid grid-cols-2 gap-8">
         
@@ -190,7 +189,7 @@
       </div>
     </div>
 
-    <!-- View: Bloco de Notas -->
+    <!-- escrever texto -->
     <div id="view-notes" class="hidden flex-1 flex flex-col p-6 view-section bg-[#0d1117]">
       <div class="max-w-5xl mx-auto w-full flex-1 flex flex-col">
         <div class="flex items-center justify-between mb-4">
@@ -206,7 +205,7 @@
 
   <!-- TODOS OS MODAIS -->
   
-  <!-- MODAL: Configurar IP -->
+  <!-- MODAL de Configurar IP -->
   <div id="modal-ip" class="hidden fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4">
     <div class="bg-[#161b22] border border-[#30363d] rounded-xl w-full max-w-md p-6" onclick="event.stopPropagation()">
       <div class="flex items-center justify-between mb-6">
@@ -260,7 +259,7 @@
     </div>
   </div>
 
-  <!-- MODAL: Adicionar Servidor (Catalogo) -->
+  <!-- MODAL de Adicionar Servidor (Catalogo) AINDA ARRUMAR -->
   <div id="modal-add-server" class="hidden fixed inset-0 bg-black/70 z-[60] flex items-center justify-center p-4">
     <div class="bg-[#161b22] border border-[#30363d] rounded-xl w-full max-w-sm p-6" onclick="event.stopPropagation()">
       <div class="flex items-center justify-between mb-4">
@@ -281,7 +280,7 @@
     </div>
   </div>
 
-  <!-- MODAL: Adicionar Modelo -->
+  <!-- MODAL de Adicionar Modelo -->
   <div id="modal-add-model" class="hidden fixed inset-0 bg-black/70 z-[60] flex items-center justify-center p-4">
     <div class="bg-[#161b22] border border-[#30363d] rounded-xl w-full max-w-sm p-6" onclick="event.stopPropagation()">
       <div class="flex items-center justify-between mb-4">
@@ -302,7 +301,7 @@
     </div>
   </div>
 
-  <!-- MODAL: Adicionar/Editar Estoque -->
+  <!-- MODAL para Adicionar/Editar Estoque -->
   <div id="modal-estoque" class="hidden fixed inset-0 bg-black/70 z-[60] flex items-center justify-center p-4">
     <div class="bg-[#161b22] border border-[#30363d] rounded-xl w-full max-w-md p-6" onclick="event.stopPropagation()">
       <div class="flex items-center justify-between mb-4">
@@ -463,7 +462,7 @@
       await carregarNotas();
     }
 
-    // --- FERRAMENTAS: SERVIDORES E MODELOS ---
+    // --- SERVIDORES E MODELOS DE EQUIPAMENTO ---
     async function carregarServidores() {
       try {
         const data = await apiRequest('/api/servers');
