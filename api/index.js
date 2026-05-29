@@ -20,9 +20,7 @@ app.use((req, res, next) => {
   next();
 });
 
-// ==========================================
-// ROTAS DE SERVIDORES (CATÁLOGO)
-// ==========================================
+// ROTAS DE SERVIDORES
 app.get('/api/servers', async (req, res) => {
   try {
     const { rows } = await pool.query('SELECT * FROM servidores ORDER BY id ASC');
@@ -56,9 +54,9 @@ app.delete('/api/servers', async (req, res) => {
   }
 });
 
-// ==========================================
+
 // ROTAS DE MODELOS DE TERMINAL
-// ==========================================
+
 app.get('/api/models', async (req, res) => {
   try {
     const { rows } = await pool.query('SELECT * FROM modelos_terminal ORDER BY id ASC');
@@ -92,9 +90,9 @@ app.delete('/api/models', async (req, res) => {
   }
 });
 
-// ==========================================
+
 // ROTAS DE ESTOQUE
-// ==========================================
+
 app.get('/api/estoque', async (req, res) => {
   try {
     const { rows } = await pool.query('SELECT * FROM estoque ORDER BY id DESC');
@@ -134,9 +132,8 @@ app.delete('/api/estoque', async (req, res) => {
   }
 });
 
-// ==========================================
 // ROTAS DE MAPA DE IPS
-// ==========================================
+
 app.get('/api/ips', async (req, res) => {
   try {
     const { rows } = await pool.query('SELECT * FROM rede_ips ORDER BY ip_suffix ASC');
@@ -174,9 +171,9 @@ app.delete('/api/ips', async (req, res) => {
   }
 });
 
-// ==========================================
+
 // ROTAS DO BLOCO DE NOTAS
-// ==========================================
+
 app.get('/api/notes', async (req, res) => {
   try {
     const { rows } = await pool.query('SELECT conteudo FROM bloco_notas WHERE id = 1');
